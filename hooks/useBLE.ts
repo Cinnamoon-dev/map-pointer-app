@@ -9,6 +9,7 @@ import { PermissionsAndroid, Platform } from "react-native"
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>
     scanForPeripherals(): void
+    allDevices: Device[]
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -74,13 +75,29 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
-    const scanForPeripherals = () => {
+    const isDuplicateDevice = (devices: Device[], nextDevice: Device) => 
+        devices.findIndex((device) => nextDevice.id === device.id) > -1
 
+    const scanForPeripherals = () => {
+        bleManager.startDeviceScan(null, null, (error, device) => {
+            if(error) {
+                console.log(error)
+            }
+            if(device && device.name?.includes("CorSense")) {
+                setAllDevices((prevState) => {
+                    if(!isDuplicateDevice(prevState, device)) {
+                        return [...prevState, device]
+                    }
+                    return prevState
+                })
+            }
+        })
     }
 
     return {
         scanForPeripherals,
-        requestPermissions
+        requestPermissions,
+        allDevices
     }
 }
 
