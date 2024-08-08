@@ -83,6 +83,8 @@ function useBLE(): BluetoothLowEnergyApi {
             if(error) {
                 console.log(error)
             }
+            // TODO
+            // Change here to choose ESP32 device name
             if(device && device.name?.includes("CorSense")) {
                 setAllDevices((prevState) => {
                     if(!isDuplicateDevice(prevState, device)) {
