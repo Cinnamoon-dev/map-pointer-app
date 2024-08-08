@@ -32,6 +32,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name='main'
+        options={{
+          title: 'Connect',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={'chevron-down-circle'}/>
+          )
+        }}
+      />
     </Tabs>
   );
 }
