@@ -10,11 +10,14 @@ interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>
     scanForPeripherals(): void
     allDevices: Device[]
+    connectToDevice: (deviceId: Device) => Promise<void>
+    connectedDevice: Device | null
 }
 
 function useBLE(): BluetoothLowEnergyApi {
     const bleManager = useMemo(() => new BleManager(), [])
     const [allDevices, setAllDevices] = useState<Device[]>([])
+    const [connectedDevice, setConnectedDevice] = useState<Device | null>(null)
 
     const requestAndroid31Permissions = async () => {
         const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -85,7 +88,8 @@ function useBLE(): BluetoothLowEnergyApi {
             }
             // TODO
             // Change here to choose ESP32 device name
-            if(device && device.name?.includes("CorSense")) {
+            //if(device && device.name?.includes("CorSense")) {
+            if(device) {
                 setAllDevices((prevState) => {
                     if(!isDuplicateDevice(prevState, device)) {
                         return [...prevState, device]
@@ -96,10 +100,24 @@ function useBLE(): BluetoothLowEnergyApi {
         })
     }
 
+    const connectToDevice = async (device: Device) => {
+        try {
+            const deviceConnection = await bleManager.connectToDevice(device.id)
+            setConnectedDevice(deviceConnection)
+
+            await deviceConnection.discoverAllServicesAndCharacteristics()
+            bleManager.stopDeviceScan()
+        } catch(e) {
+            console.log("ERROR IN CONNECTION", e)
+        }
+    }
+
     return {
         scanForPeripherals,
         requestPermissions,
-        allDevices
+        allDevices,
+        connectToDevice,
+        connectedDevice
     }
 }
 
