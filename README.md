@@ -1,8 +1,7 @@
-# Welcome to your Expo app 👋
+# map-pointer-app
+Aplicativo para guiar o [driver](https://github.com/Cinnamoon-dev/pan-tilt-map-pointer) de um laser pointer.
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
-
-## Get started
+### Building app
 
 1. Install dependencies
 
@@ -16,6 +15,8 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo prebuild
    ```
 
+### Running the app in an emulator
+
 3. Start the app
 
    ```bash
@@ -23,16 +24,24 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
     npx expo run:ios
    ```
 
-In the output, you'll find options to open the app in a
+### Running the app in an android device
+- Enable debugging over USB
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- Plug in your device via USB
+- Check that your device is properly connecting to Android Debug Bridge
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   ```bash
+    adb devices
+   ```
 
-## Get a fresh project
+- Start the app
+
+   ```bash
+    npx expo run:android
+    npx expo run:ios
+   ```
+
+### Get a fresh project
 
 When you're ready, run:
 
@@ -42,16 +51,10 @@ npm run reset-project
 
 This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### Basic Bluetooth working
+1. O aplicativo vai verificar se tem as permissões para acessar o módulo de bluetooth
+   1. Caso não tenha, o aplicativo vai pedir as permissões e executar o que ele quer fazer quando as tiver
+   2. Os dois passos acima podem entrar em um loop infinito caso as permissões não sejam dadas
+2. O aplicativo vai escanear pelos dispositivos bluetooth próximos e poder ter acesso a cada um deles em uma lista em um state
+3. O aplicativo vai se conectar a um desses dispositivos disponíveis atráves de um método da biblioteca BLE
+4. ????
