@@ -31,8 +31,8 @@ const DeviceItem = (props: DeviceItemProps) => {
 const DeviceList = (props: DeviceListProps) => {
     return(
         <ScrollView >
-            { props.devices.map((device) => 
-                <DeviceItem device={device} connectToDevice={props.connectToDevice}/>
+            { props.devices.map((device, index) => 
+                <DeviceItem key={index} device={device} connectToDevice={props.connectToDevice}/>
             )}
         </ScrollView>
     )
@@ -68,8 +68,8 @@ const MainScreen = () => {
     return(
         <SafeAreaView style={styles.container}>
             <ScrollView>
-                <TouchableOpacity onPress={openModal} style={styles.connectButton}>
-                    <Text>Connect</Text>
+                <TouchableOpacity onPress={scanForDevices} style={styles.scanButton}>
+                    <Text>Scan</Text>
                 </TouchableOpacity>
 
                 <View>
@@ -77,8 +77,8 @@ const MainScreen = () => {
                     <DeviceList devices={allDevices} connectToDevice={connectToDevice}/>
                 </View>
 
-                <TouchableOpacity onPress={() => console.log(allDevices)} style={styles.connectButton}>
-                    <Text>Show Devices</Text>
+                <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles.scanButton}>
+                    <Text>Log Devices</Text>
                 </TouchableOpacity>
             </ScrollView>
         </SafeAreaView>
@@ -89,11 +89,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    connectButton: {
+    scanButton: {
         backgroundColor: "#d4d4d4",
         padding: 10,
         borderRadius: 5,
         maxWidth: 100
+    },
+    connectButton: {
+        backgroundColor: "#d4d4d4",
+        padding: 10,
+        borderRadius: 5,
+        maxWidth: 300
     }
 })
 
