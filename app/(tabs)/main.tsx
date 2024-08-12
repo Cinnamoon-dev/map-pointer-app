@@ -1,7 +1,8 @@
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native"
-import useBLE from "@/hooks/useBLE"
 import { useState } from "react";
+import useBLE from "@/hooks/useBLE"
 import { Device } from "react-native-ble-plx";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
 
 type DeviceListProps = {
     devices: Device[]
@@ -9,14 +10,14 @@ type DeviceListProps = {
 
 const DeviceList = (props: DeviceListProps) => {
     return(
-        <View>
+        <ScrollView >
             { props.devices.map((device) => 
                 <View>
                     <Text>{device.id}</Text>
                     <Text>{device.name}</Text>
                 </View>
             )}
-        </View>
+        </ScrollView>
     )
 }
 
@@ -48,28 +49,28 @@ const MainScreen = () => {
     }
 
     return(
-        <View style={styles.container}>
-            <TouchableOpacity onPress={openModal} style={styles.connectButton}>
-                <Text>Connect</Text>
-            </TouchableOpacity>
+        <SafeAreaView style={styles.container}>
+            <ScrollView>
+                <TouchableOpacity onPress={openModal} style={styles.connectButton}>
+                    <Text>Connect</Text>
+                </TouchableOpacity>
 
-            <View>
-                <Text>Device List</Text>
-                <DeviceList devices={allDevices}/>
-            </View>
+                <View>
+                    <Text>Device List</Text>
+                    <DeviceList devices={allDevices}/>
+                </View>
 
-            <TouchableOpacity onPress={() => console.log(allDevices)} style={styles.connectButton}>
-                <Text>Show Devices</Text>
-            </TouchableOpacity>
-        </View>
+                <TouchableOpacity onPress={() => console.log(allDevices)} style={styles.connectButton}>
+                    <Text>Show Devices</Text>
+                </TouchableOpacity>
+            </ScrollView>
+        </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: "space-evenly",
-        alignItems: "center",
     },
     connectButton: {
         backgroundColor: "#d4d4d4",
