@@ -6,16 +6,33 @@ import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-nati
 
 type DeviceListProps = {
     devices: Device[]
+    connectToDevice: (deviceId: Device) => Promise<void>
+}
+
+type DeviceItemProps = {
+    device: Device
+    connectToDevice: (deviceId: Device) => Promise<void>
+}
+
+const DeviceItem = (props: DeviceItemProps) => {
+    const conn = () => {
+        console.log(`connecting to ${props.device.id}-${props.device.name}`)
+        props.connectToDevice(props.device)
+    }
+
+    return(
+        <TouchableOpacity onPress={conn} style={styles.connectButton}>
+            <Text>{props.device.id}</Text>
+            <Text>{props.device.name}</Text>
+        </TouchableOpacity>
+    )
 }
 
 const DeviceList = (props: DeviceListProps) => {
     return(
         <ScrollView >
             { props.devices.map((device) => 
-                <View>
-                    <Text>{device.id}</Text>
-                    <Text>{device.name}</Text>
-                </View>
+                <DeviceItem device={device} connectToDevice={props.connectToDevice}/>
             )}
         </ScrollView>
     )
@@ -57,7 +74,7 @@ const MainScreen = () => {
 
                 <View>
                     <Text>Device List</Text>
-                    <DeviceList devices={allDevices}/>
+                    <DeviceList devices={allDevices} connectToDevice={connectToDevice}/>
                 </View>
 
                 <TouchableOpacity onPress={() => console.log(allDevices)} style={styles.connectButton}>
@@ -76,6 +93,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#d4d4d4",
         padding: 10,
         borderRadius: 5,
+        maxWidth: 100
     }
 })
 
