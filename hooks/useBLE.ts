@@ -5,6 +5,9 @@ import { useMemo, useState } from "react"
 import { BleManager, Device } from "react-native-ble-plx"
 import { PermissionsAndroid, Platform } from "react-native"
 
+const ESP32_UUID = "ed5cbce4-8d9d-42b6-968d-c634d46fa050"
+const ESP32_CHARACTERISTIC = ""
+const ESP32_NAME = "cleitin"
 
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>
@@ -18,6 +21,7 @@ function useBLE(): BluetoothLowEnergyApi {
     const bleManager = useMemo(() => new BleManager(), [])
     const [allDevices, setAllDevices] = useState<Device[]>([])
     const [connectedDevice, setConnectedDevice] = useState<Device | null>(null)
+    const [heartRate, setHeartRate] = useState<number>(-1)
 
     const requestAndroid31Permissions = async () => {
         const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -82,7 +86,7 @@ function useBLE(): BluetoothLowEnergyApi {
         devices.findIndex((device) => nextDevice.id === device.id) > -1
 
     const scanForPeripherals = () => {
-        bleManager.startDeviceScan(null, null, (error, device) => {
+        bleManager.startDeviceScan(null, {legacyScan: true}, (error, device) => {
             if(error) {
                 console.log(error)
             }
@@ -109,6 +113,19 @@ function useBLE(): BluetoothLowEnergyApi {
             bleManager.stopDeviceScan()
         } catch(e) {
             console.log("ERROR IN CONNECTION", e)
+        }
+    }
+
+    const startStreamingData = (device: Device) => {
+        if(device) {
+            //device.monitorCharacteristicForService(
+            //    "",
+            //    "",
+            //    //onHeartRateUpdate
+            //)
+        }
+        else {
+            console.log("No Device Connected")
         }
     }
 
