@@ -37,8 +37,8 @@ Aplicativo para guiar o [driver](https://github.com/Cinnamoon-dev/pan-tilt-map-p
 - Start the app
 
    ```bash
-    npx expo run:android
-    npx expo run:ios
+    npm run android
+    npm run ios
    ```
 
 ### Get a fresh project
