@@ -5,9 +5,9 @@ import { useMemo, useState } from "react"
 import { BleManager, Device } from "react-native-ble-plx"
 import { PermissionsAndroid, Platform } from "react-native"
 
-const ESP32_UUID = "ed5cbce4-8d9d-42b6-968d-c634d46fa050"
-const ESP32_CHARACTERISTIC = ""
-const ESP32_NAME = "cleitin"
+const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
+const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
+const ESP32_NAME = "cleitinBLE"
 
 interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>
@@ -86,14 +86,12 @@ function useBLE(): BluetoothLowEnergyApi {
         devices.findIndex((device) => nextDevice.id === device.id) > -1
 
     const scanForPeripherals = () => {
-        bleManager.startDeviceScan(null, {legacyScan: true}, (error, device) => {
+        bleManager.startDeviceScan(null, null, (error, device) => {
             if(error) {
                 console.log(error)
             }
-            // TODO
-            // Change here to choose ESP32 device name
-            //if(device && device.name?.includes("CorSense")) {
-            if(device) {
+
+            if(device && device.name?.includes("cleitinBLE")) {
                 setAllDevices((prevState) => {
                     if(!isDuplicateDevice(prevState, device)) {
                         return [...prevState, device]
@@ -110,6 +108,7 @@ function useBLE(): BluetoothLowEnergyApi {
             setConnectedDevice(deviceConnection)
 
             await deviceConnection.discoverAllServicesAndCharacteristics()
+            console.log("connected to device")
             bleManager.stopDeviceScan()
         } catch(e) {
             console.log("ERROR IN CONNECTION", e)
@@ -123,8 +122,7 @@ function useBLE(): BluetoothLowEnergyApi {
             //    "",
             //    //onHeartRateUpdate
             //)
-        }
-        else {
+        } else {
             console.log("No Device Connected")
         }
     }
