@@ -47,22 +47,11 @@ const MainScreen = () => {
         connectedDevice
     } = useBLE();
 
-    const [isModalVisible, setIsModalVisible] = useState<boolean>(false)
-
     const scanForDevices = async () => {
         const isPermissionsEnabled = await requestPermissions()
         if(isPermissionsEnabled) {
             scanForPeripherals()
         }
-    }
-
-    const hideModal = () => {
-        setIsModalVisible(false)
-    }
-
-    const openModal = async () => {
-        scanForDevices()
-        setIsModalVisible(true)
     }
 
     return(
