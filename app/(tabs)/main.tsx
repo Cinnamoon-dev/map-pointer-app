@@ -1,7 +1,11 @@
 import useBLE from "@/hooks/useBLE"
+import base64 from "react-native-base64";
 import { Device } from "react-native-ble-plx";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
+
+const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
+const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
 
 type DeviceListProps = {
     devices: Device[]
@@ -56,6 +60,10 @@ const MainScreen = () => {
         }
     }
 
+    const sendCharacteristic = () => {
+        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode("BLEU"))
+    }
+
     return(
         <SafeAreaView style={styles.container}>
             <ScrollView>
@@ -76,6 +84,10 @@ const MainScreen = () => {
             <View>
                 <Text>Dados Streamados</Text>
                 <Text>{data}</Text>
+            </View>
+
+            <View>
+                <TouchableOpacity onPress={sendCharacteristic} style={styles.scanButton}><Text>Send Data to ESP</Text></TouchableOpacity>
             </View>
         </SafeAreaView>
     )
