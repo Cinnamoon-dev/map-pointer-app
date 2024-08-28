@@ -96,7 +96,7 @@ function useBLE(): BluetoothLowEnergyApi {
                 console.log(error)
             }
 
-            if(device && device.name?.includes("cleitinBLE")) {
+            if(device && device.name?.includes(ESP32_NAME)) {
                 setAllDevices((prevState) => {
                     if(!isDuplicateDevice(prevState, device)) {
                         return [...prevState, device]
