@@ -122,32 +122,6 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
-    const onHeartRateUpdate = (
-        error: BleError | null,
-        characteristic: Characteristic | null
-    ) => {
-        if(error) {
-            console.log(error)
-            return
-        } else if(!characteristic?.value) {
-            console.log("No data received")
-            return
-        }
-
-        const rawData = base64.decode(characteristic.value)
-        let innerHeartRate: number = -1
-
-        const firstBitValue: number = Number(rawData) & 0x01
-
-        if(firstBitValue === 0) {
-            innerHeartRate = 
-                Number(rawData[1].charCodeAt(0) << 8) +
-                Number(rawData[2].charCodeAt(2))
-        }
-
-        setHeartRate(innerHeartRate)
-    }
-
     const onCharacteristicUpdate = (error: BleError | null, characteristic: Characteristic | null) => {
         if(error) {
             console.log(error)
