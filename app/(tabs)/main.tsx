@@ -1,6 +1,4 @@
-import { useState } from "react";
 import useBLE from "@/hooks/useBLE"
-import base64 from "react-native-base64";
 import { Device } from "react-native-ble-plx";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
@@ -50,7 +48,6 @@ const MainScreen = () => {
         setData
     } = useBLE();
 
-    const [treatedData, setTreatedData] = useState<string>("")
 
     const scanForDevices = async () => {
         const isPermissionsEnabled = await requestPermissions()
@@ -78,12 +75,7 @@ const MainScreen = () => {
 
             <View>
                 <Text>Dados Streamados</Text>
-                <TouchableOpacity style={styles.scanButton} onPress={() => {
-                    let decoded = base64.decode(data)
-                    setTreatedData(decoded)
-                }}><Text>Treat data</Text></TouchableOpacity>
-                
-                <Text>{treatedData}</Text>
+                <Text>{data}</Text>
             </View>
         </SafeAreaView>
     )
