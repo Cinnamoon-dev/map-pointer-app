@@ -139,7 +139,7 @@ function useBLE(): BluetoothLowEnergyApi {
     const startStreamingData = (device: Device) => {
         if(device) {
             device.monitorCharacteristicForService(
-                ESP32_UUID ,
+                ESP32_UUID,
                 ESP32_CHARACTERISTIC,
                 onCharacteristicUpdate
             )
