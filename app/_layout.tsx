@@ -10,12 +10,14 @@ export default function RootLayout() {
           <MaterialIcons name="bluetooth" color={color} size={size} />
         ),
         headerShown: false,
+        title: "Conectar ao ESP"
       }} />
       <Tabs.Screen name="home" options={{
         tabBarIcon: ({ color, size }) => (
           <FontAwesome5 name="gamepad" color={color} size={size} />
         ),
         headerShown: false,
+        title: "Quiz"
       }} />
     </Tabs>
   );

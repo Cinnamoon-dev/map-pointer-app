@@ -67,7 +67,8 @@ const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     marginTop: 15,
-    backgroundColor: 'white'
+    backgroundColor: 'white',
+    flex: 1
   },
   logo: {
     height: 370,
