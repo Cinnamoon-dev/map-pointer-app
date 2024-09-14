@@ -3,6 +3,7 @@ import base64 from "react-native-base64";
 import { Device } from "react-native-ble-plx";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
+import colors from "@/styles/colors";
 
 const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
 const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
@@ -66,49 +67,66 @@ const MainScreen = () => {
 
     return(
         <SafeAreaView style={styles.container}>
+          <View style={styles.containerContent}>
             <ScrollView>
-                <TouchableOpacity onPress={scanForDevices} style={styles.scanButton}>
-                    <Text>Scan</Text>
-                </TouchableOpacity>
+                  <TouchableOpacity onPress={scanForDevices} style={styles.button}>
+                      <Text style={styles.buttonText}>Scan</Text>
+                  </TouchableOpacity>
 
-                <View>
-                    <Text>Device List</Text>
-                    <DeviceList devices={allDevices} connectToDevice={connectToDevice}/>
-                </View>
+                  <View>
+                      <Text style={styles.text}>Device List</Text>
+                      <DeviceList devices={allDevices} connectToDevice={connectToDevice}/>
+                  </View>
 
-                <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles.scanButton}>
-                    <Text>Log Devices</Text>
-                </TouchableOpacity>
-            </ScrollView>
+                  <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles.button}>
+                      <Text style={styles.buttonText}>Log Devices</Text>
+                  </TouchableOpacity>
+              </ScrollView>
 
-            <View>
-                <Text>Dados Streamados</Text>
-                <Text>{data}</Text>
-            </View>
+              <View>
+                  <Text style={styles.text}>Dados Streamados</Text>
+                  <Text>{data}</Text>
+              </View>
 
-            <View>
-                <TouchableOpacity onPress={sendCharacteristic} style={styles.scanButton}><Text>Send Data to ESP</Text></TouchableOpacity>
+              <View>
+                  <TouchableOpacity onPress={sendCharacteristic} style={styles.button}>
+                    <Text style={styles.buttonText}>Send Data to ESP</Text>
+                  </TouchableOpacity>
+              </View>
             </View>
         </SafeAreaView>
     )
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
-    scanButton: {
-        backgroundColor: "#d4d4d4",
-        padding: 10,
-        borderRadius: 5,
-        maxWidth: 100
-    },
-    connectButton: {
-        backgroundColor: "#d4d4d4",
-        padding: 10,
-        borderRadius: 5,
-        maxWidth: 300
-    }
+  container: {
+    flex: 1,
+    alignItems: 'center'
+  },
+  containerContent: {
+    margin: 10,
+    flex: 1,
+  },
+  button: {
+    backgroundColor: colors.tertiary,
+    padding: 14,
+    width: 120,
+    borderRadius: 10,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+  },
+  buttonText: {
+    color: colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  text: {
+    textAlign: 'center',
+    color: colors.primary,
+    fontSize: 20,
+    fontWeight: '600',
+  },
 })
 
 export default MainScreen
