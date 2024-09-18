@@ -49,7 +49,7 @@ const MainScreen = () => {
         connectToDevice,
         connectedDevice,
         data,
-        setData
+        startStreamingData
     } = useBLE();
 
 
@@ -83,6 +83,7 @@ const MainScreen = () => {
 
             <View>
                 <Text>Dados Streamados</Text>
+                <TouchableOpacity onPress={() => startStreamingData(connectedDevice)} style={styles.scanButton}><Text>Pegar dados streamados</Text></TouchableOpacity>
                 <Text>{data}</Text>
             </View>
 
