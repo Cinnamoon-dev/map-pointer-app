@@ -3,6 +3,7 @@ import base64 from "react-native-base64";
 import { Device } from "react-native-ble-plx";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
+import BottomTabBar from '../components/BottomTabBar'
 import colors from "@/styles/colors";
 
 const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
@@ -25,7 +26,7 @@ const DeviceItem = (props: DeviceItemProps) => {
     }
 
     return(
-        <TouchableOpacity onPress={conn} style={styles.connectButton}>
+        <TouchableOpacity onPress={conn} style={styles.button}>
             <Text>{props.device.id}</Text>
             <Text>{props.device.name}</Text>
         </TouchableOpacity>
@@ -94,6 +95,9 @@ const MainScreen = () => {
                   </TouchableOpacity>
               </View>
             </View>
+            <View style={styles.bottomTabBar}>
+                <BottomTabBar />
+            </View>
         </SafeAreaView>
     )
 }
@@ -126,6 +130,9 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontSize: 20,
     fontWeight: '600',
+  },
+  bottomTabBar: {
+    width: '100%',
   },
 })
 

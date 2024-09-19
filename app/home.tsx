@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomTabBar from '../components/BottomTabBar'
+import { useRouter } from 'expo-router';
 import colors from '../styles/colors';
-// Importar hook para BLE (adapte conforme sua implementação)
-import useBLE from '@/hooks/useBLE'; // Ajuste o caminho conforme necessário
+import useBLE from '@/hooks/useBLE'; 
 
-const HomeScreen: React.FC = () => {
-  const { connectedDevice } = useBLE(); // Desestruturar o estado de dispositivo conectado do hook useBLE
+const HomeScreen = () => {
+  const router = useRouter();
+  const { connectedDevice } = useBLE(); 
 
   // Handler para o botão Start Quiz
   const handleStartQuiz = () => {
     if (!connectedDevice) {
       Alert.alert('Dispositivo não conectado', 'Por favor, conecte-se a um dispositivo Bluetooth antes de iniciar o quiz.');
-      return;
-    } 
+      //return;
+    }
+    router.push('/mapX')
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScrollView>
       <Image
         style={styles.logo}
         source={require('../assets/images/logo.png')} // Usando require para garantir compatibilidade com o TypeScript
@@ -57,8 +61,12 @@ const HomeScreen: React.FC = () => {
         onPress={handleStartQuiz} // Acionando a função handleStartQuiz ao pressionar o botão
         style={styles.startButton}
       >
-        <Text style={styles.startButtonText}>Start Quiz</Text>
+        <Text style={styles.startButtonText}>Começar Quiz</Text>
       </Pressable>
+      </ScrollView>
+      <View style={styles.bottomTabBar}>
+        <BottomTabBar />
+      </View>   
     </SafeAreaView>
   );
 };
@@ -66,9 +74,9 @@ const HomeScreen: React.FC = () => {
 // Estilos usando StyleSheet para melhor performance
 const styles = StyleSheet.create({
   container: {
-    marginTop: 15,
+    marginTop: 20,
     backgroundColor: 'white',
-    flex: 1
+    flex: 1,
   },
   logo: {
     height: 370,
@@ -112,11 +120,15 @@ const styles = StyleSheet.create({
     marginLeft: 'auto',
     marginRight: 'auto',
     marginTop: 30,
+    marginBottom: 21,
   },
   startButtonText: {
     color: colors.quaternary,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  bottomTabBar: {
+    width: '100%',
   },
 });
 
