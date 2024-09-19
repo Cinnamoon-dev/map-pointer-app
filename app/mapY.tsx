@@ -37,12 +37,14 @@ const map = () => {
           <Text style={styles.text}>Mova o laser para o canto superior direito.</Text>
         </View>
       </View>
-      <Pressable
-        onPress= {handleBeginButton}
-        style={styles.continueButton}
-      >
-        <Text style={styles.continueButtonText}>Começar</Text>
-      </Pressable>
+      <View style={styles.buttonContainer}>
+        <Pressable
+          onPress= {handleBeginButton}
+          style={styles.continueButton}
+        >
+          <Text style={styles.continueButtonText}>Começar</Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   )
 }
@@ -79,6 +81,11 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '500',
   },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
+  },
   continueButton: {
     backgroundColor: colors.primary,
     padding: 14,
@@ -86,11 +93,10 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: 30,
-    marginBottom: 21,
   },
   continueButtonText: {
     color: colors.quaternary,
+    fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',
   },

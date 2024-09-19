@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     color: colors.quaternary,
+    fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',
   },
