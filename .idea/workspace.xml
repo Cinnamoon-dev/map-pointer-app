@@ -7,8 +7,7 @@
     <list default="true" id="97aabecb-b9cf-4645-8def-d12e6284c95b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/home.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/home.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/mapX.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/mapX.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/mapY.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/mapY.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/components/BottomTabBar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/components/BottomTabBar.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ios/myapp3/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/ios/myapp3/Info.plist" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

@@ -10,7 +10,6 @@ interface Question {
   id: number;
   question: string;
   correctAnswer: string;
-  image: string;
 }
 
 const QuestionsScreen: React.FC = () => {
@@ -102,12 +101,6 @@ const QuestionsScreen: React.FC = () => {
 
       <View style={styles.questionContainer}>
         <Text style={styles.questionText}>{currentQuestion?.question}</Text>
-        {currentQuestion?.image && (
-          <Image 
-          style={styles.map} 
-          source={{ uri: currentQuestion.image }} 
-        />
-        )}
       </View>
 
       <View style={styles.containerAnswer}>

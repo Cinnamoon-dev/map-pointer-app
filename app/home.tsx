@@ -56,13 +56,14 @@ const HomeScreen = () => {
           </View>
         </View>
       </View>
-
-      <Pressable
-        onPress={handleStartQuiz} // Acionando a função handleStartQuiz ao pressionar o botão
-        style={styles.startButton}
-      >
-        <Text style={styles.startButtonText}>Começar Quiz</Text>
-      </Pressable>
+      <View style={styles.startButtonContainer}>
+        <Pressable
+          onPress={handleStartQuiz} // Acionando a função handleStartQuiz ao pressionar o botão
+          style={styles.startButton}
+        >
+          <Text style={styles.startButtonText}>Começar Quiz</Text>
+        </Pressable>
+      </View>
       </ScrollView>
       <View style={styles.bottomTabBar}>
         <BottomTabBar />
@@ -79,7 +80,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    height: 370,
+    height: 420,
     width: '100%',
     resizeMode: 'contain',
   },
@@ -89,7 +90,7 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     color: colors.primary,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
   },
   rulesList: {
@@ -109,13 +110,18 @@ const styles = StyleSheet.create({
   ruleText: {
     marginLeft: 4,
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '500',
+  },
+  startButtonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
   },
   startButton: {
     backgroundColor: colors.primary,
     padding: 14,
-    width: 120,
+    width: 150,
     borderRadius: 25,
     marginLeft: 'auto',
     marginRight: 'auto',
