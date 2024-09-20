@@ -60,8 +60,8 @@ const MainScreen = () => {
         }
     }
 
-    const sendCharacteristic = () => {
-        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode("BLEU"))
+    const sendCharacteristic = (value: string) => {
+        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode(value))
     }
 
     return(
@@ -88,7 +88,9 @@ const MainScreen = () => {
             </View>
 
             <View>
-                <TouchableOpacity onPress={sendCharacteristic} style={styles.scanButton}><Text>Send Data to ESP</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => sendCharacteristic("data")} style={styles.scanButton}><Text>Send Data to ESP</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => sendCharacteristic("a")} style={styles.scanButton}><Text>Lower Left</Text></TouchableOpacity>
+                <TouchableOpacity onPress={() => sendCharacteristic("b")} style={styles.scanButton}><Text>Top Right</Text></TouchableOpacity>
             </View>
         </SafeAreaView>
     )
