@@ -22,12 +22,12 @@ const ResultScreen: React.FC = () => {
       </View>
 
       <View style={styles.containerHeaderQuestions}>
-        <Text>Questions Answered</Text>
+        <Text>Perguntas Respondidas</Text>
         <Text>({answers.length}/12)</Text>
       </View>
 
-      <Pressable style={styles.containerQuestions}>
-        <Text style={styles.scoreCard}>Score Card</Text>
+      <View style={styles.containerQuestions}>
+        <Text style={styles.scoreCard}>Erros e Acertos</Text>
         <FlatList
           numColumns={2}
           data={answers}
@@ -43,7 +43,7 @@ const ResultScreen: React.FC = () => {
             </View>
           )}
         />
-      </Pressable>
+      </View>
     </SafeAreaView>
   );
 };
@@ -52,9 +52,11 @@ export default ResultScreen;
 
 const styles = StyleSheet.create({
   container: {
-    margin: 10
+    flex:1,
+    backgroundColor: 'white'
   },
   containerHeader: {
+    margin: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
@@ -66,6 +68,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   containerHeaderQuestions: {
+    margin: 10,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -73,7 +76,7 @@ const styles = StyleSheet.create({
   },
   containerQuestions: {
     backgroundColor: 'white',
-    height: 200,
+    height: 'auto',
     borderRadius: 7,
     marginTop: 20
   },

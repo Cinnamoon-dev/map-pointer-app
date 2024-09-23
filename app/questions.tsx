@@ -50,8 +50,8 @@ const QuestionsScreen: React.FC = () => {
     setIsVerifying(true);
 
     // Exemplo de coordenadas
-    const lat = -23.55052; // Latitude
-    const lon = -46.633308; // Longitude
+    const lat = -12.9704; // Latitude
+    const lon = -38.5124; // Longitude
     const locationName = await fetchLocationData(lat, lon);
 
     const currentQuestion = data[index];
