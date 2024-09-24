@@ -19,6 +19,7 @@ interface BluetoothLowEnergyApi {
     connectedDevice: Device | null
     data: string
     startStreamingData: (device: Device | null) => void
+    sendCharacteristic: (value: string) => void
 }
 
 function useBLE(): BluetoothLowEnergyApi {
@@ -146,6 +147,10 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
+    const sendCharacteristic = (value: string) => {
+        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode(value))
+    }
+
     return {
         scanForPeripherals,
         requestPermissions,
@@ -153,7 +158,8 @@ function useBLE(): BluetoothLowEnergyApi {
         connectToDevice,
         connectedDevice,
         data,
-        startStreamingData
+        startStreamingData,
+        sendCharacteristic
     }
 }
 
