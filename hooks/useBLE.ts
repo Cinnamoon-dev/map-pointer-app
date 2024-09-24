@@ -18,14 +18,14 @@ interface BluetoothLowEnergyApi {
     connectToDevice: (deviceId: Device) => Promise<void>
     connectedDevice: Device | null
     data: string
-    setData: React.Dispatch<any>
+    startStreamingData: (device: Device | null) => void
+    sendCharacteristic: (value: string) => void
 }
 
 function useBLE(): BluetoothLowEnergyApi {
     const bleManager = useMemo(() => new BleManager(), [])
     const [allDevices, setAllDevices] = useState<Device[]>([])
     const [connectedDevice, setConnectedDevice] = useState<Device | null>(null)
-    const [heartRate, setHeartRate] = useState<number>(-1)
     const [data, setData] = useState<string>("")
 
     const requestAndroid31Permissions = async () => {
@@ -116,7 +116,6 @@ function useBLE(): BluetoothLowEnergyApi {
             console.log("connected to device")
             bleManager.stopDeviceScan()
 
-            startStreamingData(deviceConnection)
         } catch(e) {
             console.log("ERROR IN CONNECTION", e)
         }
@@ -136,7 +135,7 @@ function useBLE(): BluetoothLowEnergyApi {
         setData(rawData)
     }
 
-    const startStreamingData = (device: Device) => {
+    const startStreamingData = (device: Device | null) => {
         if(device) {
             device.monitorCharacteristicForService(
                 ESP32_UUID,
@@ -148,6 +147,10 @@ function useBLE(): BluetoothLowEnergyApi {
         }
     }
 
+    const sendCharacteristic = (value: string) => {
+        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode(value))
+    }
+
     return {
         scanForPeripherals,
         requestPermissions,
@@ -155,7 +158,8 @@ function useBLE(): BluetoothLowEnergyApi {
         connectToDevice,
         connectedDevice,
         data,
-        setData
+        startStreamingData,
+        sendCharacteristic
     }
 }
 
