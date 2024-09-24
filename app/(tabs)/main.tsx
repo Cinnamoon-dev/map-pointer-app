@@ -49,7 +49,8 @@ const MainScreen = () => {
         connectToDevice,
         connectedDevice,
         data,
-        startStreamingData
+        startStreamingData,
+        sendCharacteristic
     } = useBLE();
 
 
@@ -58,10 +59,6 @@ const MainScreen = () => {
         if(isPermissionsEnabled) {
             scanForPeripherals()
         }
-    }
-
-    const sendCharacteristic = (value: string) => {
-        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode(value))
     }
 
     return(
