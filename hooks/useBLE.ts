@@ -11,7 +11,7 @@ const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
 const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
 const ESP32_NAME = "cleitinBLE"
 
-interface BluetoothLowEnergyApi {
+export interface BluetoothLowEnergyApi {
     requestPermissions(): Promise<boolean>
     scanForPeripherals(): void
     allDevices: Device[]
