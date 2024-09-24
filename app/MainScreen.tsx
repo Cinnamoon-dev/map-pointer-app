@@ -3,6 +3,7 @@ import React, { createContext, ReactNode, useState } from "react";
 import { Device } from "react-native-ble-plx";
 import ConnScreen from '../components/ConnScreen'
 import { BluetoothLowEnergyApi } from "@/hooks/useBLE";
+import { SafeAreaView, View, Text } from "react-native";
 
 type BLEContextType = {
   dataBLE: BluetoothLowEnergyApi
@@ -33,7 +34,12 @@ const Main = () => {
 
   return(
     <BLEProvider currentComponent={currentComponent} setCurrentComponent={setCurrentComponent}>
-      {<ConnScreen/> && currentComponent == 0}
+      <View>
+        {<ConnScreen/> && currentComponent == 0}
+        {<SafeAreaView><View><Text>FOI</Text></View></SafeAreaView> && currentComponent == 1}
+      </View>
     </BLEProvider>
   )
 }
+
+export default Main
