@@ -12,17 +12,19 @@ import useBLE from "@/hooks/useBLE"
 const map = () => {
   const router = useRouter();
   const coordenateX = ''
-  const {connectedDevice} = useBLE();
+  const {sendCharacteristic, data} = useBLE();
   const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
   const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
 
   // Handler para o botão Start Quiz
   const handleBeginButton = () => {
-    if (coordenateX != '') {
+    sendCharacteristic("b")
+    setTimeout(()=>{}, 2000)
+    console.log("Ponto Y: ", data)
+    if (data !== 'upper') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      //return;
+      return;
     }
-    connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode(coordenateX))
     router.push('/questions')
   };
   return (

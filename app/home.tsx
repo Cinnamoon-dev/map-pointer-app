@@ -12,9 +12,10 @@ const HomeScreen = () => {
 
   // Handler para o botão Start Quiz
   const handleStartQuiz = () => {
-    if (!connectedDevice) {
+    console.log("Dispositivo conectado: " , connectedDevice?.name)
+    if (connectedDevice?.name != "cleitinBLE") {
       Alert.alert('Dispositivo não conectado', 'Por favor, conecte-se a um dispositivo Bluetooth antes de iniciar o quiz.');
-      //return;
+      return;
     }
     router.push('/mapX')
   };
@@ -24,7 +25,7 @@ const HomeScreen = () => {
       <ScrollView>
       <Image
         style={styles.logo}
-        source={require('../assets/images/logo.png')} // Usando require para garantir compatibilidade com o TypeScript
+        source={require('../assets/images/logo-all-primary.png')} // Usando require para garantir compatibilidade com o TypeScript
       />
 
       <View style={styles.rulesContainer}>
@@ -80,7 +81,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logo: {
-    height: 420,
+    height: 290,
     width: '100%',
     resizeMode: 'contain',
   },
