@@ -83,6 +83,17 @@ const MainScreen = () => {
                       <Text style={styles.buttonText}>Log Devices</Text>
                   </TouchableOpacity>
               </ScrollView>
+
+              <View>
+                  <Text style={styles.text}>Dados Streamados</Text>
+                  <Text>{data}</Text>
+              </View>
+
+              <View>
+                  <TouchableOpacity onPress={sendCharacteristic} style={styles.button}>
+                    <Text style={styles.buttonText}>Send Data to ESP</Text>
+                  </TouchableOpacity>
+              </View>
             </View>
             <View style={styles.bottomTabBar}>
                 <BottomTabBar />

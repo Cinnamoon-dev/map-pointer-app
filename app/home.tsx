@@ -1,23 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Pressable, StyleSheet, Alert } from 'react-native';
+import { View, Text, Image, Pressable, StyleSheet, Alert, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import BottomTabBar from '../components/BottomTabBar'
+import { useRouter } from 'expo-router';
 import colors from '../styles/colors';
-// Importar hook para BLE (adapte conforme sua implementação)
-import useBLE from '@/hooks/useBLE'; // Ajuste o caminho conforme necessário
+import useBLE from '@/hooks/useBLE'; 
 
-const HomeScreen: React.FC = () => {
-  const { connectedDevice } = useBLE(); // Desestruturar o estado de dispositivo conectado do hook useBLE
+const HomeScreen = () => {
+  const router = useRouter();
+  const { connectedDevice } = useBLE(); 
 
   // Handler para o botão Start Quiz
   const handleStartQuiz = () => {
     if (!connectedDevice) {
       Alert.alert('Dispositivo não conectado', 'Por favor, conecte-se a um dispositivo Bluetooth antes de iniciar o quiz.');
-      return;
-    } 
+      //return;
+    }
+    router.push('/mapX')
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      <ScrollView>
       <Image
         style={styles.logo}
         source={require('../assets/images/logo.png')} // Usando require para garantir compatibilidade com o TypeScript
@@ -52,13 +56,18 @@ const HomeScreen: React.FC = () => {
           </View>
         </View>
       </View>
-
-      <Pressable
-        onPress={handleStartQuiz} // Acionando a função handleStartQuiz ao pressionar o botão
-        style={styles.startButton}
-      >
-        <Text style={styles.startButtonText}>Start Quiz</Text>
-      </Pressable>
+      <View style={styles.startButtonContainer}>
+        <Pressable
+          onPress={handleStartQuiz} // Acionando a função handleStartQuiz ao pressionar o botão
+          style={styles.startButton}
+        >
+          <Text style={styles.startButtonText}>Começar Quiz</Text>
+        </Pressable>
+      </View>
+      </ScrollView>
+      <View style={styles.bottomTabBar}>
+        <BottomTabBar />
+      </View>   
     </SafeAreaView>
   );
 };
@@ -66,12 +75,12 @@ const HomeScreen: React.FC = () => {
 // Estilos usando StyleSheet para melhor performance
 const styles = StyleSheet.create({
   container: {
-    marginTop: 15,
+    marginTop: 20,
     backgroundColor: 'white',
-    flex: 1
+    flex: 1,
   },
   logo: {
-    height: 370,
+    height: 420,
     width: '100%',
     resizeMode: 'contain',
   },
@@ -81,7 +90,7 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     color: colors.primary,
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
   },
   rulesList: {
@@ -101,22 +110,32 @@ const styles = StyleSheet.create({
   ruleText: {
     marginLeft: 4,
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 17,
     fontWeight: '500',
+  },
+  startButtonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
   },
   startButton: {
     backgroundColor: colors.primary,
     padding: 14,
-    width: 120,
+    width: 150,
     borderRadius: 25,
     marginLeft: 'auto',
     marginRight: 'auto',
     marginTop: 30,
+    marginBottom: 21,
   },
   startButtonText: {
     color: colors.quaternary,
+    fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  bottomTabBar: {
+    width: '100%',
   },
 });
 
