@@ -1,41 +1,36 @@
-import useBLE from "@/hooks/useBLE"
-import base64 from "react-native-base64";
+import React, { useState } from "react";
 import { Device } from "react-native-ble-plx";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { StyleSheet, View, Text, TouchableOpacity, ScrollView } from "react-native"
-import BottomTabBar from '../components/BottomTabBar'
-import colors from "@/styles/colors";
-
-const ESP32_UUID = "d013b1b9-1363-4eb1-8828-767c78631c27"
-const ESP32_CHARACTERISTIC = "be7a367f-ed56-40e7-aea7-272614708747"
+import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import colors from "@/styles/colors"
+import useBLE from "@/hooks/useBLE";
 
 type DeviceListProps = {
-    devices: Device[]
-    connectToDevice: (deviceId: Device) => Promise<void>
+  devices: Device[]
+  connectToDevice: (deviceId: Device) => Promise<void>
 }
 
 type DeviceItemProps = {
-    device: Device
-    connectToDevice: (deviceId: Device) => Promise<void>
+  device: Device
+  connectToDevice: (deviceId: Device) => Promise<void>
 }
 
 const DeviceItem = (props: DeviceItemProps) => {
-    const conn = () => {
-        console.log(`connecting to ${props.device.id}-${props.device.name}`)
-        props.connectToDevice(props.device)
-    }
+  const conn = () => {
+    console.log(`connecting to ${props.device.id}-${props.device.name}`)
+    props.connectToDevice(props.device)
+  }
 
-    return(
-        <TouchableOpacity onPress={conn} style={styles.button}>
-            <Text>{props.device.id}</Text>
-            <Text>{props.device.name}</Text>
-        </TouchableOpacity>
-    )
+  return(
+      <TouchableOpacity onPress={conn} style={styles0.button}>
+          <Text>{props.device.id}</Text>
+          <Text>{props.device.name}</Text>
+      </TouchableOpacity>
+  )
 }
 
 const DeviceList = (props: DeviceListProps) => {
     return(
-        <ScrollView >
+        <ScrollView>
             { props.devices.map((device, index) => 
                 <DeviceItem key={index} device={device} connectToDevice={props.connectToDevice}/>
             )}
@@ -43,55 +38,60 @@ const DeviceList = (props: DeviceListProps) => {
     )
 }
 
-const MainScreen = () => {
-    const {
-        requestPermissions,
-        scanForPeripherals,
-        allDevices,
-        connectToDevice,
-        connectedDevice,
-        data,
-        setData
-    } = useBLE();
+const Main = () => {
+  const {
+    requestPermissions,
+    scanForPeripherals,
+    allDevices,
+    connectToDevice,
+    connectedDevice
+  } = useBLE()
+  const [currentComponent, setCurrentComponent] = useState<number>(1)
 
+  const scanForDevices = async () => {
+      const isPermissionsEnabled = await requestPermissions()
+      if(isPermissionsEnabled) {
+          scanForPeripherals()
+      }
+  }
 
-    const scanForDevices = async () => {
-        const isPermissionsEnabled = await requestPermissions()
-        if(isPermissionsEnabled) {
-            scanForPeripherals()
+  return(
+      <SafeAreaView>
+        {currentComponent === 1 && 
+          <SafeAreaView>
+            <View><Text>Componente numero 1</Text></View>
+            <TouchableOpacity onPress={() => setCurrentComponent((prevState) => prevState - 1)} style={styles0.button}><Text>Go Back</Text></TouchableOpacity>
+
+            <TouchableOpacity onPress={scanForDevices} style={styles0.button}>
+              <Text style={styles0.buttonText}>Scan</Text>
+            </TouchableOpacity>
+
+            <View>
+              <Text style={styles0.text}>Device List</Text>
+              <DeviceList devices={allDevices} connectToDevice={connectToDevice} />
+            </View>
+
+            <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles0.button}>
+              <Text style={styles0.buttonText}>Log Devices</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => {
+              setCurrentComponent((prevState) => prevState + 1)
+            }}><Text>Next Screen</Text></TouchableOpacity>
+          </SafeAreaView> 
         }
-    }
-
-    const sendCharacteristic = () => {
-        connectedDevice?.writeCharacteristicWithResponseForService(ESP32_UUID, ESP32_CHARACTERISTIC, base64.encode("BLEU"))
-    }
-
-    return(
-        <SafeAreaView style={styles.container}>
-          <View style={styles.containerContent}>
-            <ScrollView>
-                  <TouchableOpacity onPress={scanForDevices} style={styles.button}>
-                      <Text style={styles.buttonText}>Scan</Text>
-                  </TouchableOpacity>
-
-                  <View>
-                      <Text style={styles.text}>Device List</Text>
-                      <DeviceList devices={allDevices} connectToDevice={connectToDevice}/>
-                  </View>
-
-                  <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles.button}>
-                      <Text style={styles.buttonText}>Log Devices</Text>
-                  </TouchableOpacity>
-              </ScrollView>
-            </View>
-            <View style={styles.bottomTabBar}>
-                <BottomTabBar />
-            </View>
-        </SafeAreaView>
-    )
+        {currentComponent === 2 && 
+          <View>
+            <View><Text>Componente numero 2</Text></View>
+            <TouchableOpacity onPress={() => setCurrentComponent((prevState) => prevState - 1)} style={styles0.button}><Text>Go Back</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
+          </View> 
+        }
+      </SafeAreaView>
+  )
 }
 
-const styles = StyleSheet.create({
+const styles0 = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center'
@@ -125,4 +125,4 @@ const styles = StyleSheet.create({
   },
 })
 
-export default MainScreen
+export default Main
