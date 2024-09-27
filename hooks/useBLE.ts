@@ -18,7 +18,6 @@ export interface BluetoothLowEnergyApi {
     connectToDevice: (deviceId: Device) => Promise<void>
     connectedDevice: Device | null
     data: string
-    startStreamingData: (device: Device | null) => void
     sendCharacteristic: (value: string) => void
 }
 
@@ -116,6 +115,7 @@ function useBLE(): BluetoothLowEnergyApi {
             console.log("connected to device")
             bleManager.stopDeviceScan()
 
+            startStreamingData(deviceConnection)
         } catch(e) {
             console.log("ERROR IN CONNECTION", e)
         }
@@ -158,7 +158,6 @@ function useBLE(): BluetoothLowEnergyApi {
         connectToDevice,
         connectedDevice,
         data,
-        startStreamingData,
         sendCharacteristic
     }
 }
