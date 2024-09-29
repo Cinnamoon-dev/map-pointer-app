@@ -17,7 +17,7 @@ export interface BluetoothLowEnergyApi {
     allDevices: Device[]
     connectToDevice: (deviceId: Device) => Promise<void>
     connectedDevice: Device | null
-    data: string
+    characteristicReceived: string
     sendCharacteristic: (value: string) => void
 }
 
@@ -25,7 +25,7 @@ function useBLE(): BluetoothLowEnergyApi {
     const bleManager = useMemo(() => new BleManager(), [])
     const [allDevices, setAllDevices] = useState<Device[]>([])
     const [connectedDevice, setConnectedDevice] = useState<Device | null>(null)
-    const [data, setData] = useState<string>("")
+    const [characteristicReceived, setCharacteristicReceived] = useState<string>("")
 
     const requestAndroid31Permissions = async () => {
         const bluetoothScanPermission = await PermissionsAndroid.request(
@@ -132,7 +132,7 @@ function useBLE(): BluetoothLowEnergyApi {
         }
 
         const rawData = base64.decode(characteristic.value)
-        setData(rawData)
+        setCharacteristicReceived(rawData)
     }
 
     const startStreamingData = (device: Device | null) => {
@@ -157,7 +157,7 @@ function useBLE(): BluetoothLowEnergyApi {
         allDevices,
         connectToDevice,
         connectedDevice,
-        data,
+        characteristicReceived,
         sendCharacteristic
     }
 }
