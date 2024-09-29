@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Device } from "react-native-ble-plx";
-import { SafeAreaView, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { Alert, SafeAreaView, Image, Pressable, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import colors from "@/styles/colors"
 import useBLE from "@/hooks/useBLE";
 
@@ -41,10 +41,12 @@ const DeviceList = (props: DeviceListProps) => {
 const Main = () => {
   const {
     requestPermissions,
+    sendCharacteristic,
     scanForPeripherals,
     allDevices,
     connectToDevice,
-    connectedDevice
+    connectedDevice,
+    data
   } = useBLE()
   const [currentComponent, setCurrentComponent] = useState<number>(1)
 
@@ -53,6 +55,20 @@ const Main = () => {
       if(isPermissionsEnabled) {
           scanForPeripherals()
       }
+  }
+
+  const handleContinueButton = () => {
+    sendCharacteristic("a")
+
+    setTimeout(() => {}, 2000)
+    console.log("Ponto X: ", data)
+
+    if (data !== 'lower') {
+      Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
+      return;
+    }
+
+    setCurrentComponent((prevState) => prevState + 1)
   }
 
   return(
@@ -86,6 +102,28 @@ const Main = () => {
             <TouchableOpacity onPress={() => setCurrentComponent((prevState) => prevState - 1)} style={styles0.button}><Text>Go Back</Text></TouchableOpacity>
             <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
           </View> 
+        }
+        {currentComponent === 3 &&
+          <View>
+            <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
+            <View style={stylesMapX.containerMap}>
+              <Image
+                style={stylesMapX.map}
+                source={require('../assets/images/left-bottom-dot.png')}
+              />
+              <View style={stylesMapX.containerText}>
+                <Text style={stylesMapX.text}>Mova o laser para o canto inferior esquerdo.</Text>
+              </View>
+            </View>
+            <View style={stylesMapX.buttonContainer}>
+              <Pressable
+                onPress={handleContinueButton}
+                style={stylesMapX.continueButton}
+              >
+                <Text style={stylesMapX.continueButtonText}>Continuar</Text>
+              </Pressable>
+            </View>
+          </View>
         }
       </SafeAreaView>
   )
@@ -122,6 +160,58 @@ const styles0 = StyleSheet.create({
   },
   bottomTabBar: {
     width: '100%',
+  },
+})
+
+const stylesMapX = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
+  containerMap: {
+    margin: 10
+  },
+  title: {
+    color: colors.primary,
+    fontSize: 25,
+    fontWeight: '600',
+    alignSelf: 'center'
+  },
+  map: {
+    height: 370,
+    width: '100%',
+    resizeMode: 'contain',
+  },
+  containerText: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: colors.quaternary,
+  },
+  text: {
+    marginLeft: 4,
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '500',
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
+  },
+  continueButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    width: 120,
+    borderRadius: 25,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+
+  },
+  continueButtonText: {
+    color: colors.quaternary,
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
   },
 })
 
