@@ -71,6 +71,20 @@ const Main = () => {
     setCurrentComponent((prevState) => prevState + 1)
   }
 
+  const handleBeginButton = () => {
+    sendCharacteristic("b")
+
+    setTimeout(() => {}, 2000)
+    console.log("Ponto Y: ", data)
+
+    if (data !== 'upper') {
+      Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
+      return;
+    }
+
+    setCurrentComponent((prevState) => prevState + 1)
+  }
+
   return(
       <SafeAreaView>
         {currentComponent === 1 && 
@@ -94,16 +108,10 @@ const Main = () => {
             <TouchableOpacity onPress={() => {
               setCurrentComponent((prevState) => prevState + 1)
             }}><Text>Next Screen</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
           </SafeAreaView> 
         }
-        {currentComponent === 2 && 
-          <View>
-            <View><Text>Componente numero 2</Text></View>
-            <TouchableOpacity onPress={() => setCurrentComponent((prevState) => prevState - 1)} style={styles0.button}><Text>Go Back</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
-          </View> 
-        }
-        {currentComponent === 3 &&
+        {currentComponent === 2 &&
           <View>
             <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
             <View style={stylesMapX.containerMap}>
@@ -121,6 +129,28 @@ const Main = () => {
                 style={stylesMapX.continueButton}
               >
                 <Text style={stylesMapX.continueButtonText}>Continuar</Text>
+              </Pressable>
+            </View>
+          </View>
+        }
+        {currentComponent === 3 &&
+          <View>
+            <Text style={stylesMapY.title}> Mapeamento de coordenadas </Text>
+            <View style={stylesMapY.containerMap}>
+              <Image
+                style={stylesMapY.map}
+                source={require('../assets/images/right-top-dot.png')}
+              />
+              <View style={stylesMapY.containerText}>
+                <Text style={stylesMapY.text}>Mova o laser para o canto superior direito.</Text>
+              </View>
+            </View>
+            <View style={stylesMapY.buttonContainer}>
+              <Pressable
+                onPress={handleBeginButton}
+                style={stylesMapY.continueButton}
+              >
+                <Text style={stylesMapY.continueButtonText}>Começar</Text>
               </Pressable>
             </View>
           </View>
@@ -214,5 +244,57 @@ const stylesMapX = StyleSheet.create({
     textAlign: 'center',
   },
 })
+
+const stylesMapY = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    flex: 1,
+  },
+  containerMap: {
+    margin: 10
+  },
+  title: {
+    color: colors.primary,
+    fontSize: 25,
+    fontWeight: '600',
+    alignSelf: 'center'
+  },
+  map: {
+    height: 370,
+    width: '100%',
+    resizeMode: 'contain',
+  },
+  containerText: {
+    padding: 10,
+    borderRadius: 10,
+    backgroundColor: colors.quaternary,
+  },
+  text: {
+    marginLeft: 4,
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '500',
+  },
+  buttonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
+  },
+  continueButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    width: 120,
+    borderRadius: 25,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  continueButtonText: {
+    color: colors.quaternary,
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+})
+
 
 export default Main
