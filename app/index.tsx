@@ -7,11 +7,19 @@ import questions from "@/data/questions";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
 const API_KEY = 'S396c52b4baaf4bebad577f2329811f3e'; // Chave da OpenCage API
+const coordinatesPattern = new RegExp('^[1234567890]*,[1234567890]*$')
 
+interface Limit {
+  upper_x: number
+  upper_y: number
+  lower_x: number
+  lower_y: number
+}
 interface Question {
   id: number;
   question: string;
   correctAnswer: string;
+  limits: Limit;
 }
 
 type DeviceListProps = {
@@ -95,8 +103,10 @@ const Main = () => {
 
     setTimeout(() => {}, 2000)
     console.log("Ponto Y: ", characteristicReceived)
+    console.log(characteristicReceived !== 'upper')
+    console.log(!coordinatesPattern.test(characteristicReceived))
 
-    if (characteristicReceived !== 'upper') {
+    if (characteristicReceived !== 'upper' && coordinatesPattern.test(characteristicReceived) == false) {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
       return;
     }
@@ -104,38 +114,25 @@ const Main = () => {
     setCurrentComponent((prevState) => prevState + 1)
   }
 
-  const fetchLocationData = async (lat: number, lon: number) => {
-    try {
-      const language = 'pt'; // Definindo a linguagem da resposta como português
-      const addressOnly = 1; // Retorna apenas dados de endereço (excluindo POI)
-      const limit = 1; // Retorna apenas um resultado
-
-      const response = await fetch(
-        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${API_KEY}&language=${language}&limit=${limit}&no_annotations=1&address_only=${addressOnly}`
-      );
-      const data = await response.json();
-      if (data?.results?.length > 0) {
-        const result = data.results[0];
-        return result.components.state || result.components.country;
-      }
-      return null;
-    } catch (error) {
-      console.error('Erro ao buscar dados de localização:', error);
-      return null;
-    }
-  }
-
   const handleVerifyAnswer = async () => {
     setIsVerifying(true);
+    
+    const isInsideSquare = (coordX: number, coordY: number) => {
+      return coordX >= currentQuestion.limits.lower_x && coordX <= currentQuestion.limits.upper_x && coordY >= currentQuestion.limits.lower_y && coordY <= currentQuestion.limits.upper_y
+    }
+    
+    // Pegar as coordenadas atuais do laser pointer
+    // Verificar se está dentro do limite da questão atual
+    sendCharacteristic("olhai cleitin")
+    setTimeout(() => {}, 100)
+    sendCharacteristic("olhai cleitin")
+    setTimeout(() => {}, 100)
 
-    // Exemplo de coordenadas
-    const lat = -12.9704; // Latitude
-    const lon = -38.5124; // Longitude
-    const locationName = await fetchLocationData(lat, lon);
+    const [coordX, coordY] = characteristicReceived.split(",") // "123,123"
+    console.log(`X: ${coordX}, Y: ${coordY}`)
 
     const currentQuestion = questions[index];
-
-    if (locationName && locationName.toLowerCase() === currentQuestion.correctAnswer.toLowerCase()) {
+    if(isInsideSquare(parseInt(coordX), parseInt(coordY))) {
       setPoints((prevPoints) => prevPoints + 10);
       setAnswerStatus(true);
       setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: true }]);
@@ -143,6 +140,7 @@ const Main = () => {
       setAnswerStatus(false);
       setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: false }]);
     }
+    
     setIsVerifying(false);
   }
 
@@ -237,6 +235,11 @@ const Main = () => {
             <View style={stylesQuestions.containerProgress}>
               <Text style={[stylesQuestions.progressBar, { width: `${progressPercentage}%` }]} />
             </View>
+
+            <TouchableOpacity onPress={() => {
+              sendCharacteristic("c")
+              console.log(characteristicReceived)
+            }}><Text>Get Limits</Text></TouchableOpacity>
 
             <View style={stylesQuestions.questionContainer}>
               <Text style={stylesQuestions.questionText}>{currentQuestion?.question}</Text>
