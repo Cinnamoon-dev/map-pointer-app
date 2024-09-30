@@ -38,22 +38,22 @@ const DeviceItem = (props: DeviceItemProps) => {
     props.connectToDevice(props.device)
   }
 
-  return(
-      <TouchableOpacity onPress={conn} style={styles0.button}>
-          <Text>{props.device.id}</Text>
-          <Text>{props.device.name}</Text>
-      </TouchableOpacity>
+  return (
+    <TouchableOpacity onPress={conn} style={styles0.button}>
+      <Text>{props.device.id}</Text>
+      <Text>{props.device.name}</Text>
+    </TouchableOpacity>
   )
 }
 
 const DeviceList = (props: DeviceListProps) => {
-    return(
-        <ScrollView>
-            { props.devices.map((device, index) => 
-                <DeviceItem key={index} device={device} connectToDevice={props.connectToDevice}/>
-            )}
-        </ScrollView>
-    )
+  return (
+    <ScrollView>
+      {props.devices.map((device, index) =>
+        <DeviceItem key={index} device={device} connectToDevice={props.connectToDevice} />
+      )}
+    </ScrollView>
+  )
 }
 
 const Main = () => {
@@ -78,16 +78,16 @@ const Main = () => {
   const progressPercentage = Math.floor((index / totalQuestions) * 100);
 
   const scanForDevices = async () => {
-      const isPermissionsEnabled = await requestPermissions()
-      if(isPermissionsEnabled) {
-          scanForPeripherals()
-      }
+    const isPermissionsEnabled = await requestPermissions()
+    if (isPermissionsEnabled) {
+      scanForPeripherals()
+    }
   }
 
   const handleContinueButton = () => {
     sendCharacteristic("a")
 
-    setTimeout(() => {}, 2000)
+    setTimeout(() => { }, 2000)
     console.log("Ponto X: ", characteristicReceived)
 
     if (characteristicReceived !== 'lower') {
@@ -101,7 +101,7 @@ const Main = () => {
   const handleBeginButton = () => {
     sendCharacteristic("b")
 
-    setTimeout(() => {}, 2000)
+    setTimeout(() => { }, 2000)
     console.log("Ponto Y: ", characteristicReceived)
     console.log(characteristicReceived !== 'upper')
     console.log(!coordinatesPattern.test(characteristicReceived))
@@ -116,23 +116,23 @@ const Main = () => {
 
   const handleVerifyAnswer = async () => {
     setIsVerifying(true);
-    
+
     const isInsideSquare = (coordX: number, coordY: number) => {
       return coordX >= currentQuestion.limits.lower_x && coordX <= currentQuestion.limits.upper_x && coordY >= currentQuestion.limits.lower_y && coordY <= currentQuestion.limits.upper_y
     }
-    
+
     // Pegar as coordenadas atuais do laser pointer
     // Verificar se está dentro do limite da questão atual
     sendCharacteristic("olhai cleitin")
-    setTimeout(() => {}, 100)
+    setTimeout(() => { }, 100)
     sendCharacteristic("olhai cleitin")
-    setTimeout(() => {}, 100)
+    setTimeout(() => { }, 100)
 
     const [coordX, coordY] = characteristicReceived.split(",") // "123,123"
     console.log(`X: ${coordX}, Y: ${coordY}`)
 
     const currentQuestion = questions[index];
-    if(isInsideSquare(parseInt(coordX), parseInt(coordY))) {
+    if (isInsideSquare(parseInt(coordX), parseInt(coordY))) {
       setPoints((prevPoints) => prevPoints + 10);
       setAnswerStatus(true);
       setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: true }]);
@@ -140,7 +140,7 @@ const Main = () => {
       setAnswerStatus(false);
       setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: false }]);
     }
-    
+
     setIsVerifying(false);
   }
 
@@ -154,194 +154,216 @@ const Main = () => {
 
   const currentQuestion = quiz[index];
 
-  return(
-      <SafeAreaView>
-        {currentComponent === 1 &&  // Connect Device
-          <SafeAreaView>
+  return (
+    <SafeAreaView>
+      {currentComponent === 1 &&  // Connect Device
+        <SafeAreaView>
+          <Text style={styles0.title}> Conexão Bluetooth </Text>
+          <View style={{ marginTop: '20%' }}>
             <TouchableOpacity onPress={scanForDevices} style={styles0.button}>
-              <Text style={styles0.buttonText}>Scan</Text>
+              <Text style={styles0.buttonText}>Buscar Dispositivos</Text>
             </TouchableOpacity>
+          </View>
 
-            <View>
-              <Text style={styles0.text}>Device List</Text>
-              <DeviceList devices={allDevices} connectToDevice={connectToDevice} />
-            </View>
+          <View style={{ marginTop: '20%' }}>
+            <Text style={styles0.text}>Conectado ao Dispositivo:</Text>
+            { allDevices
+            ? <DeviceList devices={allDevices} connectToDevice={connectToDevice} /> 
+            : <View><Text style={{ textAlign: 'center'}}>Não há dispositivos conectados</Text></View>
+            }
+            
+          </View>
 
-            <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles0.button}>
+          <TouchableOpacity onPress={() => { setCurrentComponent((prevState) => prevState + 1) }} style={styles0.continueButton}>
+            <Text style={styles0.continueButtonText}>Continuar</Text>
+          </TouchableOpacity>
+
+          {/* <TouchableOpacity onPress={() => allDevices.map((device) => console.log(`${device.id}-${device.name}\n`))} style={styles0.button}>
               <Text style={styles0.buttonText}>Log Devices</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
-            <TouchableOpacity onPress={() => {
-              setCurrentComponent((prevState) => prevState + 1)
-            }}><Text>Next Screen</Text></TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
-          </SafeAreaView> 
-        }
-        {currentComponent === 2 && // Map lower left
-          <View>
-            <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
-            <View style={stylesMapX.containerMap}>
-              <Image
-                style={stylesMapX.map}
-                source={require('../assets/images/left-bottom-dot.png')}
-              />
-              <View style={stylesMapX.containerText}>
-                <Text style={stylesMapX.text}>Mova o laser para o canto inferior esquerdo.</Text>
-              </View>
-            </View>
-            <View style={stylesMapX.buttonContainer}>
-              <Pressable
-                onPress={handleContinueButton}
-                style={stylesMapX.continueButton}
-              >
-                <Text style={stylesMapX.continueButtonText}>Continuar</Text>
-              </Pressable>
+          {/* <TouchableOpacity onPress={() => console.log(connectedDevice)} style={styles0.button}>
+              <Text style={styles0.buttonText}>Print current device</Text>
+            </TouchableOpacity> */}
+
+        </SafeAreaView>
+      }
+      {currentComponent === 2 && // Map lower left
+        <View>
+          <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
+          <View style={stylesMapX.containerMap}>
+            <Image
+              style={stylesMapX.map}
+              source={require('../assets/images/left-bottom-dot.png')}
+            />
+            <View style={stylesMapX.containerText}>
+              <Text style={stylesMapX.text}>Mova o laser para o canto inferior esquerdo.</Text>
             </View>
           </View>
-        }
-        {currentComponent === 3 && // Map top right
-          <View>
-            <Text style={stylesMapY.title}> Mapeamento de coordenadas </Text>
-            <View style={stylesMapY.containerMap}>
-              <Image
-                style={stylesMapY.map}
-                source={require('../assets/images/right-top-dot.png')}
-              />
-              <View style={stylesMapY.containerText}>
-                <Text style={stylesMapY.text}>Mova o laser para o canto superior direito.</Text>
-              </View>
-            </View>
-            <View style={stylesMapY.buttonContainer}>
-              <Pressable
-                onPress={handleBeginButton}
-                style={stylesMapY.continueButton}
-              >
-                <Text style={stylesMapY.continueButtonText}>Começar</Text>
-              </Pressable>
+          <Pressable
+            onPress={handleContinueButton}
+            style={stylesMapX.continueButton}
+          >
+            <Text style={stylesMapX.continueButtonText}>Continuar</Text>
+          </Pressable>
+        </View>
+      }
+      {currentComponent === 3 && // Map top right
+        <View>
+          <Text style={stylesMapY.title}> Mapeamento de coordenadas </Text>
+          <View style={stylesMapY.containerMap}>
+            <Image
+              style={stylesMapY.map}
+              source={require('../assets/images/right-top-dot.png')}
+            />
+            <View style={stylesMapY.containerText}>
+              <Text style={stylesMapY.text}>Mova o laser para o canto superior direito.</Text>
             </View>
           </View>
-        }
-        {currentComponent === 4 && // Questions
-          <View>
-            <View style={stylesQuestions.header}>
-              <Text style={stylesQuestions.title}>Quiz</Text>
-            </View>
+          <View style={stylesMapY.buttonContainer}>
+            <Pressable
+              onPress={handleBeginButton}
+              style={stylesMapY.continueButton}
+            >
+              <Text style={stylesMapY.continueButtonText}>Começar</Text>
+            </Pressable>
+          </View>
+        </View>
+      }
+      {currentComponent === 4 && // Questions
+        <View>
+          <View style={stylesQuestions.header}>
+            <Text style={stylesQuestions.title}>Quiz</Text>
+          </View>
 
-            <View style={stylesQuestions.progress}>
-              <Text style={stylesQuestions.headerText}>Seu Progresso</Text>
-              <Text style={stylesQuestions.headerText}>({index + 1}/{totalQuestions}) perguntas respondidas</Text>
-            </View>
+          <View style={stylesQuestions.progress}>
+            <Text style={stylesQuestions.headerText}>Seu Progresso</Text>
+            <Text style={stylesQuestions.headerText}>({index + 1}/{totalQuestions}) perguntas respondidas</Text>
+          </View>
 
-            <View style={stylesQuestions.containerProgress}>
-              <Text style={[stylesQuestions.progressBar, { width: `${progressPercentage}%` }]} />
-            </View>
+          <View style={stylesQuestions.containerProgress}>
+            <Text style={[stylesQuestions.progressBar, { width: `${progressPercentage}%` }]} />
+          </View>
 
-            <TouchableOpacity onPress={() => {
-              sendCharacteristic("c")
-              console.log(characteristicReceived)
-            }}><Text>Get Limits</Text></TouchableOpacity>
+          <TouchableOpacity onPress={() => {
+            sendCharacteristic("c")
+            console.log(characteristicReceived)
+          }}><Text>Get Limits</Text></TouchableOpacity>
 
-            <View style={stylesQuestions.questionContainer}>
-              <Text style={stylesQuestions.questionText}>{currentQuestion?.question}</Text>
-            </View>
+          <View style={stylesQuestions.questionContainer}>
+            <Text style={stylesQuestions.questionText}>{currentQuestion?.question}</Text>
+          </View>
 
-            <View style={stylesQuestions.containerAnswer}>
-              {answerStatus !== null && (
-                <Text style={stylesQuestions.answer}>
-                  {answerStatus ? 'Resposta Correta' : 'Resposta Errada'}
-                </Text>
-              )}
+          <View style={stylesQuestions.containerAnswer}>
+            {answerStatus !== null && (
+              <Text style={stylesQuestions.answer}>
+                {answerStatus ? 'Resposta Correta' : 'Resposta Errada'}
+              </Text>
+            )}
 
-              <Pressable
-                onPress={handleVerifyAnswer}
-                style={[stylesQuestions.button, isVerifying && stylesQuestions.disabledButton]}
-                disabled={isVerifying}
-              >
-                <Text style={stylesQuestions.buttonText}>{isVerifying ? 'Verificando...' : 'Verificar Resposta'}</Text>
+            <Pressable
+              onPress={handleVerifyAnswer}
+              style={[stylesQuestions.button, isVerifying && stylesQuestions.disabledButton]}
+              disabled={isVerifying}
+            >
+              <Text style={stylesQuestions.buttonText}>{isVerifying ? 'Verificando...' : 'Verificar Resposta'}</Text>
+            </Pressable>
+
+            {/* Finalizar Quiz ou Próxima Pergunta */}
+            {index + 1 >= totalQuestions ? (
+              <Pressable onPress={handleFinishQuiz} style={stylesQuestions.button}>
+                <Text style={stylesQuestions.buttonText}>Finalizar</Text>
               </Pressable>
-
-              {/* Finalizar Quiz ou Próxima Pergunta */}
-              {index + 1 >= totalQuestions ? (
-                <Pressable onPress={handleFinishQuiz} style={stylesQuestions.button}>
-                  <Text style={stylesQuestions.buttonText}>Finalizar</Text>
+            ) : (
+              answerStatus !== null && (
+                <Pressable onPress={() => setIndex(index + 1)} style={stylesQuestions.button}>
+                  <Text style={stylesQuestions.buttonText}>Próxima Pergunta</Text>
                 </Pressable>
-              ) : (
-                answerStatus !== null && (
-                  <Pressable onPress={() => setIndex(index + 1)} style={stylesQuestions.button}>
-                    <Text style={stylesQuestions.buttonText}>Próxima Pergunta</Text>
-                  </Pressable>
-                )
+              )
+            )}
+          </View>
+        </View>
+      }
+      {currentComponent === 5 && // Resultados
+        <View>
+          <View style={stylesResult.containerHeader}>
+            <Text style={stylesResult.title}>Seus Resultados</Text>
+          </View>
+
+          <View style={stylesResult.containerHeaderQuestions}>
+            <Text>Perguntas Respondidas</Text>
+            <Text>({answers.length}/12)</Text>
+          </View>
+
+          <View style={stylesResult.containerQuestions}>
+            <Text style={stylesResult.scoreCard}>Erros e Acertos</Text>
+            <FlatList
+              numColumns={2}
+              data={answers}
+              keyExtractor={(item, index) => index.toString()} // Adicionando um keyExtractor único
+              renderItem={({ item }) => (
+                <View style={stylesResult.containerResultsQuestions}>
+                  <Text>{item.question}</Text>
+                  {item.answer === true ? (
+                    <AntDesign style={{ marginLeft: 5 }} name="checkcircle" size={20} color="green" />
+                  ) : (
+                    <AntDesign style={{ marginLeft: 5 }} name="closecircle" size={20} color="red" />
+                  )}
+                </View>
               )}
-            </View>
+            />
           </View>
-        }
-        {currentComponent === 5 && // Resultados
-          <View>
-            <View style={stylesResult.containerHeader}>
-              <Text style={stylesResult.title}>Seus Resultados</Text>
-            </View>
-
-            <View style={stylesResult.containerHeaderQuestions}>
-              <Text>Perguntas Respondidas</Text>
-              <Text>({answers.length}/12)</Text>
-            </View>
-
-            <View style={stylesResult.containerQuestions}>
-              <Text style={stylesResult.scoreCard}>Erros e Acertos</Text>
-              <FlatList
-                numColumns={2}
-                data={answers}
-                keyExtractor={(item, index) => index.toString()} // Adicionando um keyExtractor único
-                renderItem={({ item }) => (
-                  <View style={stylesResult.containerResultsQuestions}>
-                    <Text>{item.question}</Text>
-                    {item.answer === true ? (
-                      <AntDesign style={{ marginLeft: 5 }} name="checkcircle" size={20} color="green" />
-                    ) : (
-                      <AntDesign style={{ marginLeft: 5 }} name="closecircle" size={20} color="red" />
-                    )}
-                  </View>
-                )}
-              />
-            </View>
-          </View>
-        }
-      </SafeAreaView>
+        </View>
+      }
+    </SafeAreaView>
   )
 }
 
 const styles0 = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center'
+  title: {
+    color: colors.primary,
+    fontSize: 25,
+    fontWeight: '600',
+    alignSelf: 'center'
   },
-  containerContent: {
-    margin: 10,
-    flex: 1,
+  searchDeviceContainer: {
+    marginBottom: 10,
   },
   button: {
     backgroundColor: colors.tertiary,
     padding: 14,
-    width: 120,
     borderRadius: 10,
     marginLeft: 'auto',
     marginRight: 'auto',
-    marginTop: 30,
+    marginTop: 20,
   },
   buttonText: {
     color: colors.primary,
     fontWeight: '600',
     textAlign: 'center',
   },
+  continueButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    width: 120,
+    borderRadius: 25,
+    marginTop: '70%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  continueButtonText: {
+    color: colors.quaternary,
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   text: {
+    marginTop: 10,
     textAlign: 'center',
     color: colors.primary,
     fontSize: 20,
     fontWeight: '600',
-  },
-  bottomTabBar: {
-    width: '100%',
-  },
+  }
 })
 
 const stylesMapX = StyleSheet.create({
@@ -374,19 +396,14 @@ const stylesMapX = StyleSheet.create({
     fontSize: 17,
     fontWeight: '500',
   },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: '6%'
-  },
   continueButton: {
     backgroundColor: colors.primary,
     padding: 14,
     width: 120,
     borderRadius: 25,
+    marginTop: '70%',
     marginLeft: 'auto',
     marginRight: 'auto',
-
   },
   continueButtonText: {
     color: colors.quaternary,
@@ -462,7 +479,7 @@ const stylesQuestions = StyleSheet.create({
     color: colors.primary,
     fontSize: 25,
     fontWeight: '600',
-    textAlign: 'center'  
+    textAlign: 'center'
   },
   headerText: {
     color: colors.primary,
@@ -552,7 +569,7 @@ const stylesQuestions = StyleSheet.create({
 
 const stylesResult = StyleSheet.create({
   container: {
-    flex:1,
+    flex: 1,
     backgroundColor: 'white'
   },
   containerHeader: {
@@ -589,7 +606,7 @@ const stylesResult = StyleSheet.create({
   },
   containerResultsQuestions: {
     margin: 10,
-    flexDirection: 'row', 
+    flexDirection: 'row',
     marginLeft: 'auto',
     marginRight: 'auto'
   }
