@@ -1,8 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Device } from "react-native-ble-plx";
-import { Alert, SafeAreaView, Image, Pressable, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import { FlatList, Alert, SafeAreaView, Image, Pressable, View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import colors from "@/styles/colors"
 import useBLE from "@/hooks/useBLE";
+import questions from "@/data/questions";
+import AntDesign from "@expo/vector-icons/AntDesign";
+
+const API_KEY = 'S396c52b4baaf4bebad577f2329811f3e'; // Chave da OpenCage API
+
+interface Question {
+  id: number;
+  question: string;
+  correctAnswer: string;
+}
 
 type DeviceListProps = {
   devices: Device[]
@@ -46,9 +56,18 @@ const Main = () => {
     allDevices,
     connectToDevice,
     connectedDevice,
-    data
+    characteristicReceived
   } = useBLE()
+
   const [currentComponent, setCurrentComponent] = useState<number>(1)
+  const quiz: Question[] = questions;
+  const totalQuestions = quiz.length;
+  const [points, setPoints] = useState<number>(0);
+  const [index, setIndex] = useState<number>(0);
+  const [answerStatus, setAnswerStatus] = useState<boolean | null>(null);
+  const [answers, setAnswers] = useState<{ question: number; answer: boolean }[]>([]);
+  const [isVerifying, setIsVerifying] = useState<boolean>(false);
+  const progressPercentage = Math.floor((index / totalQuestions) * 100);
 
   const scanForDevices = async () => {
       const isPermissionsEnabled = await requestPermissions()
@@ -61,9 +80,9 @@ const Main = () => {
     sendCharacteristic("a")
 
     setTimeout(() => {}, 2000)
-    console.log("Ponto X: ", data)
+    console.log("Ponto X: ", characteristicReceived)
 
-    if (data !== 'lower') {
+    if (characteristicReceived !== 'lower') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
       return;
     }
@@ -75,9 +94,9 @@ const Main = () => {
     sendCharacteristic("b")
 
     setTimeout(() => {}, 2000)
-    console.log("Ponto Y: ", data)
+    console.log("Ponto Y: ", characteristicReceived)
 
-    if (data !== 'upper') {
+    if (characteristicReceived !== 'upper') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
       return;
     }
@@ -85,13 +104,62 @@ const Main = () => {
     setCurrentComponent((prevState) => prevState + 1)
   }
 
+  const fetchLocationData = async (lat: number, lon: number) => {
+    try {
+      const language = 'pt'; // Definindo a linguagem da resposta como português
+      const addressOnly = 1; // Retorna apenas dados de endereço (excluindo POI)
+      const limit = 1; // Retorna apenas um resultado
+
+      const response = await fetch(
+        `https://api.opencagedata.com/geocode/v1/json?q=${lat}+${lon}&key=${API_KEY}&language=${language}&limit=${limit}&no_annotations=1&address_only=${addressOnly}`
+      );
+      const data = await response.json();
+      if (data?.results?.length > 0) {
+        const result = data.results[0];
+        return result.components.state || result.components.country;
+      }
+      return null;
+    } catch (error) {
+      console.error('Erro ao buscar dados de localização:', error);
+      return null;
+    }
+  }
+
+  const handleVerifyAnswer = async () => {
+    setIsVerifying(true);
+
+    // Exemplo de coordenadas
+    const lat = -12.9704; // Latitude
+    const lon = -38.5124; // Longitude
+    const locationName = await fetchLocationData(lat, lon);
+
+    const currentQuestion = questions[index];
+
+    if (locationName && locationName.toLowerCase() === currentQuestion.correctAnswer.toLowerCase()) {
+      setPoints((prevPoints) => prevPoints + 10);
+      setAnswerStatus(true);
+      setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: true }]);
+    } else {
+      setAnswerStatus(false);
+      setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: false }]);
+    }
+    setIsVerifying(false);
+  }
+
+  const handleFinishQuiz = () => {
+    setCurrentComponent((prevState) => prevState + 1)
+  }
+
+  useEffect(() => {
+    setAnswerStatus(null);
+  }, [index]);
+
+  const currentQuestion = quiz[index];
+
   return(
       <SafeAreaView>
-        {currentComponent === 1 && 
+        {currentComponent === 1 &&  // Connect Device
           <SafeAreaView>
-            <View><Text>Componente numero 1</Text></View>
-            <TouchableOpacity onPress={() => setCurrentComponent((prevState) => prevState - 1)} style={styles0.button}><Text>Go Back</Text></TouchableOpacity>
-
             <TouchableOpacity onPress={scanForDevices} style={styles0.button}>
               <Text style={styles0.buttonText}>Scan</Text>
             </TouchableOpacity>
@@ -111,7 +179,7 @@ const Main = () => {
             <TouchableOpacity onPress={() => console.log(connectedDevice)}><Text>Print current device</Text></TouchableOpacity>
           </SafeAreaView> 
         }
-        {currentComponent === 2 &&
+        {currentComponent === 2 && // Map lower left
           <View>
             <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
             <View style={stylesMapX.containerMap}>
@@ -133,7 +201,7 @@ const Main = () => {
             </View>
           </View>
         }
-        {currentComponent === 3 &&
+        {currentComponent === 3 && // Map top right
           <View>
             <Text style={stylesMapY.title}> Mapeamento de coordenadas </Text>
             <View style={stylesMapY.containerMap}>
@@ -152,6 +220,86 @@ const Main = () => {
               >
                 <Text style={stylesMapY.continueButtonText}>Começar</Text>
               </Pressable>
+            </View>
+          </View>
+        }
+        {currentComponent === 4 && // Questions
+          <View>
+            <View style={stylesQuestions.header}>
+              <Text style={stylesQuestions.title}>Quiz</Text>
+            </View>
+
+            <View style={stylesQuestions.progress}>
+              <Text style={stylesQuestions.headerText}>Seu Progresso</Text>
+              <Text style={stylesQuestions.headerText}>({index + 1}/{totalQuestions}) perguntas respondidas</Text>
+            </View>
+
+            <View style={stylesQuestions.containerProgress}>
+              <Text style={[stylesQuestions.progressBar, { width: `${progressPercentage}%` }]} />
+            </View>
+
+            <View style={stylesQuestions.questionContainer}>
+              <Text style={stylesQuestions.questionText}>{currentQuestion?.question}</Text>
+            </View>
+
+            <View style={stylesQuestions.containerAnswer}>
+              {answerStatus !== null && (
+                <Text style={stylesQuestions.answer}>
+                  {answerStatus ? 'Resposta Correta' : 'Resposta Errada'}
+                </Text>
+              )}
+
+              <Pressable
+                onPress={handleVerifyAnswer}
+                style={[stylesQuestions.button, isVerifying && stylesQuestions.disabledButton]}
+                disabled={isVerifying}
+              >
+                <Text style={stylesQuestions.buttonText}>{isVerifying ? 'Verificando...' : 'Verificar Resposta'}</Text>
+              </Pressable>
+
+              {/* Finalizar Quiz ou Próxima Pergunta */}
+              {index + 1 >= totalQuestions ? (
+                <Pressable onPress={handleFinishQuiz} style={stylesQuestions.button}>
+                  <Text style={stylesQuestions.buttonText}>Finalizar</Text>
+                </Pressable>
+              ) : (
+                answerStatus !== null && (
+                  <Pressable onPress={() => setIndex(index + 1)} style={stylesQuestions.button}>
+                    <Text style={stylesQuestions.buttonText}>Próxima Pergunta</Text>
+                  </Pressable>
+                )
+              )}
+            </View>
+          </View>
+        }
+        {currentComponent === 5 && // Resultados
+          <View>
+            <View style={stylesResult.containerHeader}>
+              <Text style={stylesResult.title}>Seus Resultados</Text>
+            </View>
+
+            <View style={stylesResult.containerHeaderQuestions}>
+              <Text>Perguntas Respondidas</Text>
+              <Text>({answers.length}/12)</Text>
+            </View>
+
+            <View style={stylesResult.containerQuestions}>
+              <Text style={stylesResult.scoreCard}>Erros e Acertos</Text>
+              <FlatList
+                numColumns={2}
+                data={answers}
+                keyExtractor={(item, index) => index.toString()} // Adicionando um keyExtractor único
+                renderItem={({ item }) => (
+                  <View style={stylesResult.containerResultsQuestions}>
+                    <Text>{item.question}</Text>
+                    {item.answer === true ? (
+                      <AntDesign style={{ marginLeft: 5 }} name="checkcircle" size={20} color="green" />
+                    ) : (
+                      <AntDesign style={{ marginLeft: 5 }} name="closecircle" size={20} color="red" />
+                    )}
+                  </View>
+                )}
+              />
             </View>
           </View>
         }
@@ -295,6 +443,154 @@ const stylesMapY = StyleSheet.create({
     textAlign: 'center',
   },
 })
+
+const stylesQuestions = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 10,
+  },
+  title: {
+    color: colors.primary,
+    fontSize: 25,
+    fontWeight: '600',
+    textAlign: 'center'  
+  },
+  headerText: {
+    color: colors.primary,
+    fontSize: 15,
+    fontWeight: '500',
+    alignSelf: 'center'
+  },
+  progress: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: 10,
+  },
+  containerProgress: {
+    backgroundColor: 'white',
+    width: '100%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: 10,
+    borderRadius: 20,
+    justifyContent: 'center',
+    marginTop: 20,
+    marginLeft: 20,
+  },
+  progressBar: {
+    backgroundColor: colors.tertiary,
+    position: 'absolute',
+    left: 0,
+    height: 10,
+    right: 0,
+    borderRadius: 12,
+    marginTop: 20,
+  },
+  questionContainer: {
+    marginTop: 20,
+    padding: 10,
+    borderRadius: 6,
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  map: {
+    width: '100%',
+    height: 200,
+    resizeMode: 'contain',
+    marginTop: 10,
+  },
+  containerAnswer: {
+    marginTop: 45,
+    padding: 10,
+    borderRadius: 7,
+    height: 120,
+  },
+  answer: {
+    fontSize: 17,
+    textAlign: 'center',
+    fontWeight: 'bold',
+  },
+  button: {
+    backgroundColor: colors.tertiary,
+    padding: 14,
+    width: 120,
+    borderRadius: 25,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+    marginBottom: 21,
+  },
+  buttonText: {
+    color: colors.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  disabledButton: {
+    backgroundColor: 'gray',
+  },
+  answerStatus: {
+    backgroundColor: 'green',
+    padding: 10,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 20,
+    borderRadius: 6,
+  },
+});
+
+const stylesResult = StyleSheet.create({
+  container: {
+    flex:1,
+    backgroundColor: 'white'
+  },
+  containerHeader: {
+    margin: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between'
+  },
+  title: {
+    color: colors.primary,
+    fontSize: 25,
+    fontWeight: '600',
+    alignSelf: 'center'
+  },
+  containerHeaderQuestions: {
+    margin: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: 10
+  },
+  containerQuestions: {
+    backgroundColor: 'white',
+    height: 'auto',
+    borderRadius: 7,
+    marginTop: 20
+  },
+  scoreCard: {
+    color: 'black',
+    fontSize: 15,
+    fontWeight: '500',
+    textAlign: 'center',
+    marginTop: 8
+  },
+  containerResultsQuestions: {
+    margin: 10,
+    flexDirection: 'row', 
+    marginLeft: 'auto',
+    marginRight: 'auto'
+  }
+});
 
 
 export default Main
