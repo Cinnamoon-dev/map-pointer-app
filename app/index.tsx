@@ -92,7 +92,7 @@ const Main = () => {
 
     if (characteristicReceived !== 'lower') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      return;
+      //return;
     }
 
     setCurrentComponent((prevState) => prevState + 1)
@@ -108,7 +108,7 @@ const Main = () => {
 
     if (characteristicReceived !== 'upper' && coordinatesPattern.test(characteristicReceived) == false) {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      return;
+      //return;
     }
 
     setCurrentComponent((prevState) => prevState + 1)
@@ -141,11 +141,17 @@ const Main = () => {
       setAnswers((prevAnswers) => [...prevAnswers, { question: index + 1, answer: false }]);
     }
 
+    setTimeout(() => { }, 5000)
+
     setIsVerifying(false);
   }
 
   const handleFinishQuiz = () => {
     setCurrentComponent((prevState) => prevState + 1)
+  }
+
+  const handleFinishButton = () => {
+    setCurrentComponent((prevState) => prevState = 0)
   }
 
   useEffect(() => {
@@ -170,7 +176,7 @@ const Main = () => {
             { allDevices
             ? <DeviceList devices={allDevices} connectToDevice={connectToDevice} /> 
             : <View><Text style={{ textAlign: 'center'}}>Não há dispositivos conectados</Text></View>
-            }
+            } 
             
           </View>
 
@@ -190,44 +196,42 @@ const Main = () => {
       }
       {currentComponent === 2 && // Map lower left
         <View>
-          <Text style={stylesMapX.title}> Mapeamento de coordenadas </Text>
-          <View style={stylesMapX.containerMap}>
+          <Text style={stylesMap.title}> Mapeamento de coordenadas </Text>
+          <View style={stylesMap.containerMap}>
             <Image
-              style={stylesMapX.map}
+              style={stylesMap.map}
               source={require('../assets/images/left-bottom-dot.png')}
             />
-            <View style={stylesMapX.containerText}>
-              <Text style={stylesMapX.text}>Mova o laser para o canto inferior esquerdo.</Text>
+            <View style={stylesMap.containerText}>
+              <Text style={stylesMap.text}>Mova o laser para o canto inferior esquerdo.</Text>
             </View>
           </View>
           <Pressable
             onPress={handleContinueButton}
-            style={stylesMapX.continueButton}
+            style={stylesMap.continueButton}
           >
-            <Text style={stylesMapX.continueButtonText}>Continuar</Text>
+            <Text style={stylesMap.continueButtonText}>Continuar</Text>
           </Pressable>
         </View>
       }
       {currentComponent === 3 && // Map top right
         <View>
-          <Text style={stylesMapY.title}> Mapeamento de coordenadas </Text>
-          <View style={stylesMapY.containerMap}>
+          <Text style={stylesMap.title}> Mapeamento de coordenadas </Text>
+          <View style={stylesMap.containerMap}>
             <Image
-              style={stylesMapY.map}
+              style={stylesMap.map}
               source={require('../assets/images/right-top-dot.png')}
             />
-            <View style={stylesMapY.containerText}>
-              <Text style={stylesMapY.text}>Mova o laser para o canto superior direito.</Text>
+            <View style={stylesMap.containerText}>
+              <Text style={stylesMap.text}>Mova o laser para o canto superior direito.</Text>
             </View>
           </View>
-          <View style={stylesMapY.buttonContainer}>
-            <Pressable
+          <Pressable
               onPress={handleBeginButton}
-              style={stylesMapY.continueButton}
+              style={stylesMap.continueButton}
             >
-              <Text style={stylesMapY.continueButtonText}>Começar</Text>
-            </Pressable>
-          </View>
+              <Text style={stylesMap.continueButtonText}>Começar</Text>
+          </Pressable>
         </View>
       }
       {currentComponent === 4 && // Questions
@@ -245,10 +249,10 @@ const Main = () => {
             <Text style={[stylesQuestions.progressBar, { width: `${progressPercentage}%` }]} />
           </View>
 
-          <TouchableOpacity onPress={() => {
+          {/*<TouchableOpacity onPress={() => {
             sendCharacteristic("c")
             console.log(characteristicReceived)
-          }}><Text>Get Limits</Text></TouchableOpacity>
+          }}><Text>Get Limits</Text></TouchableOpacity>*/}
 
           <View style={stylesQuestions.questionContainer}>
             <Text style={stylesQuestions.questionText}>{currentQuestion?.question}</Text>
@@ -276,8 +280,8 @@ const Main = () => {
               </Pressable>
             ) : (
               answerStatus !== null && (
-                <Pressable onPress={() => setIndex(index + 1)} style={stylesQuestions.button}>
-                  <Text style={stylesQuestions.buttonText}>Próxima Pergunta</Text>
+                <Pressable onPress={() => setIndex(index + 1)} style={stylesQuestions.nextQuestionButton}>
+                  <Text style={stylesQuestions.nextQuestionButtonText}>Próxima Pergunta</Text>
                 </Pressable>
               )
             )}
@@ -287,13 +291,13 @@ const Main = () => {
       {currentComponent === 5 && // Resultados
         <View>
           <View style={stylesResult.containerHeader}>
-            <Text style={stylesResult.title}>Seus Resultados</Text>
+            <Text style={stylesResult.title}>Suas Tentativas</Text>
           </View>
 
-          <View style={stylesResult.containerHeaderQuestions}>
+          {/*<View style={stylesResult.containerHeaderQuestions}>
             <Text>Perguntas Respondidas</Text>
-            <Text>({answers.length}/12)</Text>
-          </View>
+            <Text>({answers.length}/6)</Text>
+          </View>*/}
 
           <View style={stylesResult.containerQuestions}>
             <Text style={stylesResult.scoreCard}>Erros e Acertos</Text>
@@ -312,6 +316,12 @@ const Main = () => {
                 </View>
               )}
             />
+            <Pressable
+              onPress={handleFinishButton}
+              style={stylesResult.finishButton}
+            >
+              <Text style={stylesResult.finishButtonText}>Voltar ao início</Text>
+          </Pressable>
           </View>
         </View>
       }
@@ -366,7 +376,7 @@ const styles0 = StyleSheet.create({
   }
 })
 
-const stylesMapX = StyleSheet.create({
+const stylesMap = StyleSheet.create({
   container: {
     backgroundColor: 'white',
     flex: 1,
@@ -401,7 +411,7 @@ const stylesMapX = StyleSheet.create({
     padding: 14,
     width: 120,
     borderRadius: 25,
-    marginTop: '70%',
+    marginTop: '50%',
     marginLeft: 'auto',
     marginRight: 'auto',
   },
@@ -413,56 +423,6 @@ const stylesMapX = StyleSheet.create({
   },
 })
 
-const stylesMapY = StyleSheet.create({
-  container: {
-    backgroundColor: 'white',
-    flex: 1,
-  },
-  containerMap: {
-    margin: 10
-  },
-  title: {
-    color: colors.primary,
-    fontSize: 25,
-    fontWeight: '600',
-    alignSelf: 'center'
-  },
-  map: {
-    height: 370,
-    width: '100%',
-    resizeMode: 'contain',
-  },
-  containerText: {
-    padding: 10,
-    borderRadius: 10,
-    backgroundColor: colors.quaternary,
-  },
-  text: {
-    marginLeft: 4,
-    color: colors.primary,
-    fontSize: 17,
-    fontWeight: '500',
-  },
-  buttonContainer: {
-    flex: 1,
-    justifyContent: 'flex-end',
-    marginBottom: '6%'
-  },
-  continueButton: {
-    backgroundColor: colors.primary,
-    padding: 14,
-    width: 120,
-    borderRadius: 25,
-    marginLeft: 'auto',
-    marginRight: 'auto',
-  },
-  continueButtonText: {
-    color: colors.quaternary,
-    fontSize: 17,
-    fontWeight: '600',
-    textAlign: 'center',
-  },
-})
 
 const stylesQuestions = StyleSheet.create({
   container: {
@@ -549,6 +509,21 @@ const stylesQuestions = StyleSheet.create({
     marginTop: 30,
     marginBottom: 21,
   },
+  nextQuestionButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    width: 120,
+    borderRadius: 25,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+    marginBottom: 21,
+  },
+  nextQuestionButtonText: {
+    color: colors.quaternary,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
   buttonText: {
     color: colors.primary,
     fontWeight: '600',
@@ -609,7 +584,21 @@ const stylesResult = StyleSheet.create({
     flexDirection: 'row',
     marginLeft: 'auto',
     marginRight: 'auto'
-  }
+  },
+  finishButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    borderRadius: 25,
+    marginTop: '50%',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  },
+  finishButtonText: {
+    color: colors.quaternary,
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
 });
 
 
