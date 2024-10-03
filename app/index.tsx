@@ -109,7 +109,7 @@ const Main = () => {
 
     if (limitsPattern.test(characteristicReceived) === false) {
       Alert.alert("Não recebeu os limits")
-      return
+      //return
     }
 
     const coords = characteristicReceived.split("X").join(",").split(",")
@@ -132,7 +132,7 @@ const Main = () => {
 
     if (limitsPattern.test(characteristicReceived) === false) {
       Alert.alert("Não recebeu os limits")
-      return
+      //return
     }
 
     const coords = characteristicReceived.split("X").join(",").split(",")
@@ -162,7 +162,7 @@ const Main = () => {
 
     if (characteristicReceived !== 'lower') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      return;
+      //return;
     }
 
     setCurrentComponent((prevState) => prevState + 1)
@@ -178,9 +178,13 @@ const Main = () => {
 
     if (characteristicReceived !== 'upper' && coordinatesPattern.test(characteristicReceived) == false) {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      return;
+      //return;
     }
 
+    setCurrentComponent((prevState) => prevState + 1)
+  }
+
+  const handleBeginQuizButton = () => {
     setCurrentComponent((prevState) => prevState + 1)
   }
 
@@ -264,7 +268,53 @@ const Main = () => {
 
         </SafeAreaView>
       }
-      {currentComponent === 2 && // Map lower left
+      {currentComponent === 2 &&
+      <ScrollView>
+      <Image
+        style={stylesHome.logo}
+        source={require('../assets/images/logo-all-primary.png')} // Usando require para garantir compatibilidade com o TypeScript
+      />
+
+      <View style={stylesHome.rulesContainer}>
+        <Text style={stylesHome.title}>Regras do Quiz</Text>
+        <View style={stylesHome.rulesList}>
+          <View style={stylesHome.ruleItem}>
+            <Text style={stylesHome.ruleDot}>•</Text>
+            <Text style={stylesHome.ruleText}>
+              Para cada pergunta respondida corretamente, você ganha 5 pontos
+            </Text>
+          </View>
+          <View style={stylesHome.ruleItem}>
+            <Text style={stylesHome.ruleDot}>•</Text>
+            <Text style={stylesHome.ruleText}>
+              Não há penalidade para perguntas respondidas incorretamente
+            </Text>
+          </View>
+          <View style={stylesHome.ruleItem}>
+            <Text style={stylesHome.ruleDot}>•</Text>
+            <Text style={stylesHome.ruleText}>
+              Você deve responder todas as perguntas
+            </Text>
+          </View>
+          <View style={stylesHome.ruleItem}>
+            <Text style={stylesHome.ruleDot}>•</Text>
+            <Text style={stylesHome.ruleText}>
+              Faça o seu melhor
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View style={stylesHome.startButtonContainer}>
+        <Pressable
+          onPress={handleBeginQuizButton} // Acionando a função handleStartQuiz ao pressionar o botão
+          style={stylesHome.startButton}
+        >
+          <Text style={stylesHome.startButtonText}>Começar Quiz</Text>
+        </Pressable>
+      </View>
+      </ScrollView>
+      }
+      {currentComponent === 3 && // Map lower left
         <View>
           <Text style={stylesMap.title}> Mapeamento de coordenadas </Text>
           <View style={stylesMap.containerMap}>
@@ -284,7 +334,7 @@ const Main = () => {
           </Pressable>
         </View>
       }
-      {currentComponent === 3 && // Map top right
+      {currentComponent === 4 && // Map top right
         <View>
           <Text style={stylesMap.title}> Mapeamento de coordenadas </Text>
           <View style={stylesMap.containerMap}>
@@ -304,7 +354,7 @@ const Main = () => {
           </Pressable>
         </View>
       }
-      {currentComponent === 4 && // Questions
+      {currentComponent === 5 && // Questions
         <View>
           <View style={stylesQuestions.header}>
             <Text style={stylesQuestions.title}>Quiz</Text>
@@ -366,7 +416,7 @@ const Main = () => {
           </View>
         </View>
       }
-      {currentComponent === 5 && // Resultados
+      {currentComponent === 6 && // Resultados
         <View>
           <View style={stylesResult.containerHeader}>
             <Text style={stylesResult.title}>Suas Tentativas</Text>
@@ -435,7 +485,7 @@ const styles0 = StyleSheet.create({
     padding: 14,
     width: 120,
     borderRadius: 25,
-    marginTop: '70%',
+    marginTop: '90%',
     marginLeft: 'auto',
     marginRight: 'auto',
   },
@@ -453,6 +503,72 @@ const styles0 = StyleSheet.create({
     fontWeight: '600',
   }
 })
+
+const stylesHome = StyleSheet.create({
+  container: {
+    marginTop: 20,
+    backgroundColor: 'white',
+    flex: 1,
+  },
+  logo: {
+    height: 290,
+    width: '100%',
+    resizeMode: 'contain',
+  },
+  rulesContainer: {
+    padding: 10,
+  },
+  title: {
+    textAlign: 'center',
+    color: colors.primary,
+    fontSize: 22,
+    fontWeight: '600',
+  },
+  rulesList: {
+    padding: 10,
+    backgroundColor: colors.quaternary,
+    borderRadius: 6,
+    marginTop: 15,
+  },
+  ruleItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 5,
+  },
+  ruleDot: {
+    color: colors.primary,
+  },
+  ruleText: {
+    marginLeft: 4,
+    color: colors.primary,
+    fontSize: 17,
+    fontWeight: '500',
+  },
+  startButtonContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    marginBottom: '6%'
+  },
+  startButton: {
+    backgroundColor: colors.primary,
+    padding: 14,
+    width: 150,
+    borderRadius: 25,
+    marginLeft: 'auto',
+    marginRight: 'auto',
+    marginTop: 30,
+    marginBottom: 21,
+  },
+  startButtonText: {
+    color: colors.quaternary,
+    fontSize: 17,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  bottomTabBar: {
+    width: '100%',
+  },
+});
 
 const stylesMap = StyleSheet.create({
   container: {
@@ -500,7 +616,6 @@ const stylesMap = StyleSheet.create({
     textAlign: 'center',
   },
 })
-
 
 const stylesQuestions = StyleSheet.create({
   container: {
