@@ -4,10 +4,11 @@ import { FlatList, Alert, SafeAreaView, Image, Pressable, View, Text, TouchableO
 import colors from "@/styles/colors"
 import useBLE from "@/hooks/useBLE";
 import questions from "@/data/questions";
+import locations from "@/data/locations";
 import AntDesign from "@expo/vector-icons/AntDesign";
 
-const API_KEY = 'S396c52b4baaf4bebad577f2329811f3e'; // Chave da OpenCage API
 const coordinatesPattern = new RegExp('^[1234567890]*,[1234567890]*$')
+const limitsPattern = new RegExp('^[1234567890]*,[1234567890]*X[1234567890]*,[1234567890]*$')
 
 interface Limit {
   upper_x: number
@@ -15,6 +16,15 @@ interface Limit {
   lower_x: number
   lower_y: number
 }
+
+interface Location {
+  estate: string
+  upperX: number
+  upperY: number
+  lowerX: number
+  lowerY: number
+}
+
 interface Question {
   id: number;
   question: string;
@@ -69,6 +79,7 @@ const Main = () => {
 
   const [currentComponent, setCurrentComponent] = useState<number>(1)
   const quiz: Question[] = questions;
+  const estateLocations: Location[] = locations;
   const totalQuestions = quiz.length;
   const [points, setPoints] = useState<number>(0);
   const [index, setIndex] = useState<number>(0);
@@ -76,6 +87,65 @@ const Main = () => {
   const [answers, setAnswers] = useState<{ question: number; answer: boolean }[]>([]);
   const [isVerifying, setIsVerifying] = useState<boolean>(false);
   const progressPercentage = Math.floor((index / totalQuestions) * 100);
+
+  const [upperLimitX, setUpperLimitX] = useState<number>(-1);
+  const [upperLimitY, setUpperLimitY] = useState<number>(-1);
+  const [lowerLimitX, setLowerLimitX] = useState<number>(-1);
+  const [lowerLimitY, setLowerLimitY] = useState<number>(-1);
+
+  const getLimits = () => {
+    //sendCharacteristic("c")
+    //setTimeout(() => {}, 200)
+    //sendCharacteristic("c")
+    //setTimeout(() => {}, 200)
+
+    let i = 0
+    while(limitsPattern.test(characteristicReceived) === false) {
+      sendCharacteristic("c")
+      setTimeout(() => {}, 200)
+      console.log(i + ": " + characteristicReceived)
+      i = i + 1
+    }
+
+    if (limitsPattern.test(characteristicReceived) === false) {
+      Alert.alert("Não recebeu os limits")
+      return
+    }
+
+    const coords = characteristicReceived.split("X").join(",").split(",")
+    setLowerLimitX(parseInt(coords[0]))  
+    setLowerLimitY(parseInt(coords[1]))
+    setUpperLimitX(parseInt(coords[2]))
+    setUpperLimitY(parseInt(coords[3]))
+
+    console.log("u_x: ", upperLimitX)
+    console.log("u_y: ", upperLimitY)
+    console.log("l_x: ", lowerLimitX)
+    console.log("l_y: ", lowerLimitY)
+  }
+
+  const getLimits1 = () => {
+    sendCharacteristic("c")
+    setTimeout(() => {}, 200)
+    sendCharacteristic("c")
+    setTimeout(() => {}, 200)
+
+    if (limitsPattern.test(characteristicReceived) === false) {
+      Alert.alert("Não recebeu os limits")
+      return
+    }
+
+    const coords = characteristicReceived.split("X").join(",").split(",")
+    setLowerLimitX(parseInt(coords[0]))  
+    setLowerLimitY(parseInt(coords[1]))
+    setUpperLimitX(parseInt(coords[2]))
+    setUpperLimitY(parseInt(coords[3]))
+
+    console.log("u_x: ", upperLimitX)
+    console.log("u_y: ", upperLimitY)
+    console.log("l_x: ", lowerLimitX)
+    console.log("l_y: ", lowerLimitY)
+  }
 
   const scanForDevices = async () => {
     const isPermissionsEnabled = await requestPermissions()
@@ -92,7 +162,7 @@ const Main = () => {
 
     if (characteristicReceived !== 'lower') {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      //return;
+      return;
     }
 
     setCurrentComponent((prevState) => prevState + 1)
@@ -108,7 +178,7 @@ const Main = () => {
 
     if (characteristicReceived !== 'upper' && coordinatesPattern.test(characteristicReceived) == false) {
       Alert.alert('Coordenada não recebida', 'Por favor, aponte o laser para o ponto indicado e tente novamente.');
-      //return;
+      return;
     }
 
     setCurrentComponent((prevState) => prevState + 1)
@@ -151,7 +221,7 @@ const Main = () => {
   }
 
   const handleFinishButton = () => {
-    setCurrentComponent((prevState) => prevState = 0)
+    setCurrentComponent(1)
   }
 
   useEffect(() => {
@@ -239,6 +309,14 @@ const Main = () => {
           <View style={stylesQuestions.header}>
             <Text style={stylesQuestions.title}>Quiz</Text>
           </View>
+
+          <TouchableOpacity onPress={() => {
+            getLimits()
+          }}><Text>Get limits</Text></TouchableOpacity>
+
+          <TouchableOpacity onPress={() => {
+            getLimits1()
+          }}><Text>Get limits no loop</Text></TouchableOpacity>
 
           <View style={stylesQuestions.progress}>
             <Text style={stylesQuestions.headerText}>Seu Progresso</Text>
