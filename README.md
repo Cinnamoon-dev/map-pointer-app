@@ -57,4 +57,4 @@ This command will move the starter code to the **app-example** directory and cre
    2. Os dois passos acima podem entrar em um loop infinito caso as permissões não sejam dadas
 2. O aplicativo vai escanear pelos dispositivos bluetooth próximos e poder ter acesso a cada um deles em uma lista em um state
 3. O aplicativo vai se conectar a um desses dispositivos disponíveis atráves de um método da biblioteca BLE
-4. ????
+4. Então o aplicativo vai mandar características para o laser pointer e receber as coordenadas de volta
